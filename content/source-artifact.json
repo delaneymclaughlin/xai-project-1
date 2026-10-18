@@ -1,0 +1,1923 @@
+{
+ "title": "Algorithmic Design Features",
+ "subtitle": "Engagement-Based Ranking and the Limits of Reactive Regulation",
+ "author": "Delaney McLaughlin",
+ "affil": "Explainable AI, Duke University, Fall 2026",
+ "hook": [
+  {
+   "t": "In November 2017, Molly Russell, a 14-year-old from London, took her own life after months of viewing self-harm and suicide content on Instagram and Pinterest.",
+   "s": [
+    "S1",
+    "S2"
+   ],
+   "id": 1
+  },
+  {
+   "t": "During her inquest, it was revealed that in the six months before her death, Molly saved, liked, or shared 16,300 posts on Instagram, 2,100 of which were related to depression, self-harm, or suicide, averaging around 130 interactions a day.",
+   "s": [
+    "S1"
+   ],
+   "id": 2
+  },
+  {
+   "t": "Pinterest went as far as emailing her recommendations with subject lines such as \"10 depression pins you might like.\"",
+   "s": [
+    "S1"
+   ],
+   "id": 3
+  },
+  {
+   "t": "These posts were part of a larger algorithmic design process that was created to function and thrive by pushing for more engagement from its users, which is why Molly continued to receive this harmful content.",
+   "s": [
+    "S2"
+   ],
+   "id": 4
+  },
+  {
+   "t": "Molly's case is not isolated, as up to 95% of adolescents aged 13 to 17 use social media, and the U.S. Surgeon General has found that those who spend more than three hours a day on these platforms face roughly double the risk of depression and anxiety symptoms, while the average teen spends 3.5 hours a day.",
+   "s": [
+    "S3"
+   ],
+   "id": 5
+  }
+ ],
+ "stats": [
+  {
+   "n": "16,300",
+   "l": "Instagram posts Molly saved, liked, or shared in her last six months",
+   "s": [
+    "S1"
+   ]
+  },
+  {
+   "n": "2,100",
+   "l": "of those related to depression, self-harm, or suicide",
+   "s": [
+    "S1"
+   ]
+  },
+  {
+   "n": "~130",
+   "l": "interactions a day",
+   "s": [
+    "S1"
+   ]
+  },
+  {
+   "n": "2x",
+   "l": "risk of depression and anxiety symptoms for teens on social media 3+ hours a day",
+   "s": [
+    "S3"
+   ]
+  }
+ ],
+ "thesis": {
+  "t": "Governments around the world have increasingly responded to the harms that social media poses to young users through age-based bans and access restrictions, which determine who is able to use these platforms but do not address the engagement-driven design that causes the harm in the first place. This reflects a broader pattern of reactive correction rather than proactive regulation of the platforms' structural design. Explainable AI methods such as LIME, SHAP, and counterfactual explanations offer a way for regulators to examine how these ranking systems operate before harm occurs, although applying them in practice presents significant challenges that current policy has yet to account for.",
+  "s": []
+ },
+ "philosophy": {
+  "q": "Why is engagement-based ranking ethically wrong when it reaches vulnerable users?",
+  "intro": {
+   "t": "The harms produced by engagement-based ranking cannot be understood solely as technical failures, as they reflect value choices embedded in how these systems are designed and what they are built to prioritize. The four principles of biomedical ethics, autonomy, beneficence, nonmaleficence, and justice, provide a framework for evaluating these choices and identifying where they fall short.",
+   "s": [
+    "S25",
+    "S26"
+   ],
+   "id": 6
+  },
+  "pillars": [
+   {
+    "name": "Autonomy",
+    "body": {
+     "t": "Engagement-based ranking learns which content a user is least able to look away from and continues to supply it, which undermines the conditions that make voluntary choice possible, particularly for adolescents whose capacity for self-regulation is still developing. This builds on the argument, developed in earlier work on AI companions, that autonomy is not merely a choice but the set of conditions that make choice possible.",
+     "s": [
+      "S25",
+      "S26"
+     ],
+     "id": 7
+    }
+   },
+   {
+    "name": "Beneficence",
+    "body": {
+     "t": "These systems are optimized to maximize time spent and interaction rather than to benefit the user, meaning that any good the user receives is incidental to the system's actual objective. Meta itself describes its ranking as predicting how valuable content may be to a user so it can be shown sooner, combining predictions drawn from behavioral signals, such as whether a user is likely to share a post, with survey feedback.",
+     "s": [
+      "S25",
+      "S18"
+     ],
+     "id": 8
+    }
+   },
+   {
+    "name": "Nonmaleficence",
+    "body": {
+     "t": "When platforms are aware that their ranking systems amplify harmful content to vulnerable users and continue to deploy them without meaningful safeguards, the resulting harm is foreseeable and therefore preventable. In Molly Russell's case, the coroner's findings pointed to the platforms' engagement-driven algorithms recommending an increasing volume of harmful material to her.",
+     "s": [
+      "S25",
+      "S2",
+      "S26"
+     ],
+     "id": 9
+    }
+   },
+   {
+    "name": "Justice",
+    "body": {
+     "t": "The consequences of engagement-driven design do not fall evenly, as they are concentrated on those least able to protect themselves, including minors, users experiencing psychological distress, and populations in regions with limited regulatory oversight. In Myanmar, Facebook deployed the same engagement-maximizing systems it used everywhere else in a country where it functioned as the primary source of information, with catastrophic consequences for the Rohingya.",
+     "s": [
+      "S25",
+      "S23",
+      "S24"
+     ],
+     "id": 10
+    }
+   }
+  ],
+  "takeaway": {
+   "t": "Engagement is not a neutral metric, and the decision to optimize for it is an ethical choice that platforms are responsible for.",
+   "s": []
+  }
+ },
+ "policy": {
+  "q": "Why do current laws fail to address engagement-based ranking, and what would need to change?",
+  "intro": {
+   "t": "Current legislation addressing youth and social media can be grouped into four categories: access-based measures that restrict who can use platforms, design-based measures that regulate how platforms are built, transparency-based measures that require platforms to disclose or explain how their systems operate, and liability, where courts assign responsibility after harm has occurred. The majority of recent legislative activity has focused on access, while design and transparency measures remain limited, recent, and largely untested. Each profile below records what a measure targets, what it requires engineers and designers to build, whether it requires any form of explanation, which explainable AI methods could provide evidence of compliance, how feasible it is to implement, and what it leaves untouched.",
+   "s": []
+  },
+  "measures": [
+   {
+    "id": "au",
+    "type": "Access",
+    "juris": "Australia",
+    "name": "Social media minimum age law (under 16)",
+    "status": {
+     "t": "In effect since December 10, 2025.",
+     "s": [
+      "S5"
+     ],
+     "id": 11
+    },
+    "targets": {
+     "t": "Account access for users under 16 on platforms including Facebook, Instagram, Reddit, Snapchat, Threads, TikTok, X, and YouTube; most messaging, gaming, health, and education services are not covered.",
+     "s": [
+      "S5"
+     ],
+     "id": 12
+    },
+    "build": {
+     "t": "Platforms must take steps to keep under-16s off their services and cannot rely on users self-reporting their age, with fines of up to AUD 49.5 million.",
+     "s": [
+      "S4"
+     ],
+     "id": 13
+    },
+    "xai": {
+     "t": "None. The law does not require platforms to explain or alter how content is ranked.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "Not applicable. Compliance is demonstrated through age assurance accuracy rather than through explanations of the ranking system.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Moderate to low. Age assurance raises accuracy and privacy concerns, and no measured outcome data from the ban has yet been reported.",
+     "s": [
+      "S4"
+     ],
+     "id": 14
+    },
+    "gap": {
+     "t": "The ranking system that every user over 16 encounters remains exactly as it was before the ban.",
+     "s": []
+    }
+   },
+   {
+    "id": "bans",
+    "type": "Access",
+    "juris": "Denmark, France, Greece, Spain, Slovenia, Indonesia, Malaysia, UK",
+    "name": "Planned or proposed age bans",
+    "status": {
+     "t": "Denmark (under 15) and Malaysia (under 16) planned; France (under 15) passed its lower house; Greece (under 15) announced for January 2027; Spain and Indonesia (under 16) announced; the UK is consulting.",
+     "s": [
+      "S4"
+     ],
+     "id": 15
+    },
+    "targets": {
+     "t": "Account access by age. Greece cites anxiety, sleep problems, and addictive platform design as its reasons, yet regulates access rather than the design itself.",
+     "s": [
+      "S4"
+     ],
+     "id": 16
+    },
+    "build": {
+     "t": "Age assurance systems, in most cases mirroring the Australian model.",
+     "s": []
+    },
+    "xai": {
+     "t": "None identified in the proposals.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "Not applicable.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Uncertain. Critics including Amnesty Tech argue that such bans are ineffective and ignore how young people actually use technology, and privacy advocates raise concerns about invasive age verification.",
+     "s": [
+      "S4"
+     ],
+     "id": 17
+    },
+    "gap": {
+     "t": "These measures identify addictive design as the problem while regulating only who may be exposed to it.",
+     "s": []
+    }
+   },
+   {
+    "id": "ny",
+    "type": "Design",
+    "juris": "New York, USA",
+    "name": "SAFE for Kids Act",
+    "status": {
+     "t": "Final rules released in July 2026; the law takes effect January 25, 2027.",
+     "s": [
+      "S6"
+     ],
+     "id": 18
+    },
+    "targets": {
+     "t": "Algorithmically personalized \"addictive feeds\" and notifications between midnight and 6 a.m. for users under 18, unless a parent consents; applies to platforms where users spend at least 20% of their time on such feeds.",
+     "s": [
+      "S6"
+     ],
+     "id": 19
+    },
+    "build": {
+     "t": "Age assurance with at least one option other than government ID, tested annually with results retained for 10 years; a non-personalized feed for minors by default; data minimization for age and consent data.",
+     "s": [
+      "S6"
+     ],
+     "id": 20
+    },
+    "xai": {
+     "t": "None. The law restricts personalization but does not require the platform to explain how the personalized feed ranks content.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "Compliance could be evidenced by showing that minors' feeds receive no personalized ranking signals; SHAP or permutation importance on a minor's feed would show zero contribution from user-history features.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Moderate. Turning personalization off is technically simple, while age assurance is the harder and more contested component.",
+     "s": []
+    },
+    "gap": {
+     "t": "Once a parent consents, the engagement-optimized feed returns unchanged, and the law does not address what the ranking system optimizes for.",
+     "s": []
+    }
+   },
+   {
+    "id": "ca",
+    "type": "Design",
+    "juris": "California, USA",
+    "name": "Protecting Our Kids from Social Media Addiction Act (SB 976)",
+    "status": {
+     "t": "In effect; on September 9, 2025, the Ninth Circuit upheld the addictive feed and private-by-default provisions while striking the limit on showing engagement counts. The case returns to the district court for trial.",
+     "s": [
+      "S7"
+     ],
+     "id": 21
+    },
+    "targets": {
+     "t": "Addictive feeds, defined as feeds where content is recommended, selected, or prioritized based on information about the user, offered to minors without verifiable parental consent; private-by-default accounts.",
+     "s": [
+      "S7"
+     ],
+     "id": 22
+    },
+    "build": {
+     "t": "A non-personalized feed path for minors, parental consent flows, and privacy-protective account defaults.",
+     "s": []
+    },
+    "xai": {
+     "t": "None.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "As with New York, attribution methods could verify that user-history signals are absent from minors' rankings.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Contested in court; the provision restricting engagement counts was found unconstitutional, which shows the legal limits of regulating interface design features one at a time.",
+     "s": [
+      "S7"
+     ],
+     "id": 23
+    },
+    "gap": {
+     "t": "Defines the harm by whether a feed is personalized, not by what the feed is optimized to maximize.",
+     "s": []
+    }
+   },
+   {
+    "id": "uk",
+    "type": "Design",
+    "juris": "United Kingdom",
+    "name": "Online Safety Act, Protection of Children Codes (Ofcom)",
+    "status": {
+     "t": "In force since July 25, 2025.",
+     "s": [
+      "S8"
+     ],
+     "id": 24
+    },
+    "targets": {
+     "t": "Content recommender systems on services assessed as medium or high risk must exclude potentially harmful content from children's feeds or give it low prominence; annual children's risk assessments are required.",
+     "s": [
+      "S8"
+     ],
+     "id": 25
+    },
+    "build": {
+     "t": "Harmful content classifiers wired into the recommender, a yearly children's risk assessment, highly effective age assurance where priority harmful content is present, and reporting and complaints tools.",
+     "s": [
+      "S8"
+     ],
+     "id": 26
+    },
+    "xai": {
+     "t": "Indirect. The codes do not require explanations, but demonstrating that harmful content receives low prominence requires evidence about how the recommender ranks it.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "SHAP and counterfactuals could test whether a harmful-content flag actually lowers a post's rank, and deletion tests could check that the demotion is real rather than nominal.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "The most direct design rule of any jurisdiction reviewed, but it depends on classifiers correctly identifying harmful content, which the companion chatbot cases show can fail when context and phrasing matter.",
+     "s": []
+    },
+    "gap": {
+     "t": "Targets categories of content rather than the engagement objective, so content that falls outside the listed categories but still harms a vulnerable user continues to be amplified.",
+     "s": []
+    }
+   },
+   {
+    "id": "dsa",
+    "type": "Transparency",
+    "juris": "European Union",
+    "name": "Digital Services Act: recommender transparency (Art. 27) and non-profiling option (Art. 38)",
+    "status": {
+     "t": "In force for online platforms; Article 38 applies to very large online platforms.",
+     "s": [
+      "S9",
+      "S10"
+     ],
+     "id": 27
+    },
+    "targets": {
+     "t": "Platforms must describe, in plain and intelligible language, the main parameters of their recommender systems, including the most significant criteria and the reasons for their relative importance, and very large platforms must offer at least one recommender option not based on profiling.",
+     "s": [
+      "S9",
+      "S10"
+     ],
+     "id": 28
+    },
+    "build": {
+     "t": "Plain-language documentation of ranking criteria, user controls, and a non-profiling feed that functions as a genuine alternative.",
+     "s": []
+    },
+    "xai": {
+     "t": "Yes, at the level of the system as a whole: the \"main parameters\" requirement is a global explanation requirement. However, the requirement can be interpreted in multiple ways, and the first round of DSA audits showed platforms defining it differently.",
+     "s": [
+      "S9",
+      "S11"
+     ],
+     "id": 29
+    },
+    "xai_methods": {
+     "t": "Global methods such as permutation feature importance or mean SHAP values are the natural technical basis for a \"main parameters\" disclosure, and the five evaluation tests could become the standard for whether that disclosure is adequate.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Feasible, but without a shared standard, disclosures cannot be compared across platforms; researchers have called for specific inputs and weights to be disclosed.",
+     "s": [
+      "S11"
+     ],
+     "id": 30
+    },
+    "gap": {
+     "t": "A disclosure that is accurate but vague satisfies the law while telling a regulator or a user very little.",
+     "s": []
+    }
+   },
+   {
+    "id": "dsa-risk",
+    "type": "Transparency",
+    "juris": "European Union",
+    "name": "DSA systemic risk assessments, independent audits, and researcher data access (Arts. 34, 35, 37, 40)",
+    "status": {
+     "t": "The delegated act on researcher data access was adopted July 2, 2025, with the first researchers expected to be vetted from October 2025.",
+     "s": [
+      "S14"
+     ],
+     "id": 31
+    },
+    "targets": {
+     "t": "Very large platforms must assess and mitigate systemic risks, undergo independent audits, and give vetted researchers access to internal data for studying systemic risks in the EU.",
+     "s": [
+      "S11",
+      "S14"
+     ],
+     "id": 32
+    },
+    "build": {
+     "t": "Risk assessment processes, audit-ready evidence, and secure data access pipelines for vetted researchers.",
+     "s": []
+    },
+    "xai": {
+     "t": "Implicit. Researchers with internal data access are the only outside party who could actually run LIME, SHAP, or counterfactual analyses on a real ranking system.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "This is the provision that makes every other XAI method possible, since attribution methods require access to the model or at least to its inputs and outputs.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Promising but early; researchers report inconsistent access to data and a lack of validated metrics for harm to at-risk populations.",
+     "s": [
+      "S11"
+     ],
+     "id": 33
+    },
+    "gap": {
+     "t": "Access is limited to systemic risks in the EU, leaving users in other jurisdictions without an equivalent mechanism.",
+     "s": []
+    }
+   },
+   {
+    "id": "dsa-minors",
+    "type": "Transparency",
+    "juris": "European Union",
+    "name": "DSA guidelines on the protection of minors (Art. 28)",
+    "status": {
+     "t": "Adopted by the European Commission in July 2025.",
+     "s": [
+      "S12"
+     ],
+     "id": 34
+    },
+    "targets": {
+     "t": "Children should be able to adjust what they see, reset their feed, and understand why specific content is recommended; features that promote overuse, such as infinite scrolling, streaks, and daily rewards, should be avoided.",
+     "s": [
+      "S12"
+     ],
+     "id": 35
+    },
+    "build": {
+     "t": "Child-facing explanation features, feed reset controls, private and secure defaults, and the removal of overuse features.",
+     "s": []
+    },
+    "xai": {
+     "t": "Yes, at the level of the individual: this is a local explanation requirement written for a child as the audience.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "Local methods (LIME, SHAP) supply the raw reasons, and counterfactuals are the closest to something a child could act on, but none of the three was designed with a child as the intended audience.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "The most demanding explanation requirement reviewed. The technical lens of this project shows how far current methods are from producing an explanation a 14-year-old could understand and use.",
+     "s": []
+    },
+    "gap": {
+     "t": "The guidelines say what a child should understand without specifying how an explanation would be tested for whether a child actually understands it.",
+     "s": []
+    }
+   },
+   {
+    "id": "aiact",
+    "type": "Design",
+    "juris": "European Union",
+    "name": "AI Act, Article 5(1)(b) prohibition",
+    "status": {
+     "t": "Prohibitions have applied since February 2, 2025, with national enforcement powers from August 2, 2025 and fines of up to EUR 35 million or 7% of worldwide turnover.",
+     "s": [
+      "S13"
+     ],
+     "id": 36
+    },
+    "targets": {
+     "t": "AI systems that exploit vulnerabilities linked to age, disability, or social or economic circumstances to materially alter a person's behaviour in a way that causes, or is reasonably likely to cause, significant harm.",
+     "s": [
+      "S13"
+     ],
+     "id": 37
+    },
+    "build": {
+     "t": "Evidence that a system does not exploit age-related vulnerabilities; in practice this would require testing recommender behavior on minors specifically.",
+     "s": []
+    },
+    "xai": {
+     "t": "Implicit. Proving or disproving exploitation would require showing why a system behaves differently for vulnerable users.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "Counterfactual analysis (does the feed change when only the user's age-related signals change?) and attribution methods on minors' feeds could provide this evidence.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Untested. Whether engagement-based ranking qualifies as exploiting age-related vulnerabilities has not yet been decided, and the significant-harm threshold sets a high bar.",
+     "s": []
+    },
+    "gap": {
+     "t": "The strongest design-based language in any jurisdiction reviewed, but it has not yet been applied to social media ranking.",
+     "s": []
+    }
+   },
+   {
+    "id": "kosa",
+    "type": "Design",
+    "juris": "United States (federal)",
+    "name": "Kids Online Safety Act (KOSA)",
+    "status": {
+     "t": "Approved by the Senate Commerce Committee on August 5, 2026 and awaiting a full Senate vote; a prior version passed the Senate 91-3.",
+     "s": [
+      "S15"
+     ],
+     "id": 38
+    },
+    "targets": {
+     "t": "A duty of care requiring companies to take reasonable care to avoid creating harm to children, limits on addictive design features, and protective default settings for minors.",
+     "s": [
+      "S15"
+     ],
+     "id": 39
+    },
+    "build": {
+     "t": "Protective defaults and design changes to features identified as addictive; specifics would depend on the final text and enforcement guidance.",
+     "s": []
+    },
+    "xai": {
+     "t": "None specified in available reporting.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "A duty of care would create demand for evidence of foreseeable harm, which attribution methods and outcome audits could provide.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Pending. A duty of care is flexible but leaves the standard of evidence to be determined after the fact.",
+     "s": []
+    },
+    "gap": {
+     "t": "Not yet law.",
+     "s": []
+    }
+   },
+   {
+    "id": "kgm",
+    "type": "Liability",
+    "juris": "Los Angeles, California, USA",
+    "name": "KGM v. Meta and YouTube",
+    "status": {
+     "t": "In March 2026, a jury found Meta and YouTube negligent; it awarded $3 million in compensatory damages and recommended $3 million in punitive damages. Meta filed a notice of appeal in July 2026.",
+     "s": [
+      "S16"
+     ],
+     "id": 40
+    },
+    "targets": {
+     "t": "Design features such as infinite scroll, endless feeds, and autoplay, which plaintiffs targeted to sidestep Section 230 protections for third-party content.",
+     "s": [
+      "S16"
+     ],
+     "id": 41
+    },
+    "build": {
+     "t": "Nothing yet; a verdict assigns responsibility for past harm rather than setting forward-looking engineering requirements.",
+     "s": []
+    },
+    "xai": {
+     "t": "None.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "In litigation, attribution analyses of internal ranking data could show whether design features rather than content drove a plaintiff's exposure.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Courts can assign responsibility only after harm has already occurred, one case at a time.",
+     "s": []
+    },
+    "gap": {
+     "t": "Liability is the clearest recognition yet that design causes harm, and the clearest example of reactive correction.",
+     "s": []
+    }
+   },
+   {
+    "id": "nm",
+    "type": "Liability",
+    "juris": "New Mexico, USA",
+    "name": "New Mexico v. Meta",
+    "status": {
+     "t": "On March 24, 2026, a jury found that Meta violated New Mexico's Unfair Practices Act and imposed a $375 million penalty; Meta says it will appeal.",
+     "s": [
+      "S17"
+     ],
+     "id": 42
+    },
+    "targets": {
+     "t": "Among the practices at issue were algorithms that prioritized sensational or harmful content, alleged addictive features, and public safety statements the jury considered potentially misleading.",
+     "s": [
+      "S17"
+     ],
+     "id": 43
+    },
+    "build": {
+     "t": "Nothing yet; a separate phase will consider remedies.",
+     "s": []
+    },
+    "xai": {
+     "t": "None.",
+     "s": []
+    },
+    "xai_methods": {
+     "t": "As above, attribution and counterfactual analyses of internal data could have supported or rebutted claims about algorithmic prioritization.",
+     "s": []
+    },
+    "feasibility": {
+     "t": "Reactive and case-specific.",
+     "s": []
+    },
+    "gap": {
+     "t": "Confirms that a jury will hold a platform responsible for what its algorithms prioritize, but only after the harm.",
+     "s": []
+    }
+   }
+  ],
+  "health": {
+   "t": "Healthcare offers a useful comparison. The Coalition for Health AI's lifecycle places designing the AI system as a stage that comes before the system is engineered, piloted, or deployed, and stresses independent review to uncover risks prior to deployment. Social media ranking systems face no equivalent requirement, which means they are evaluated only after harm has already occurred, most often through litigation.",
+   "s": [
+    "S27"
+   ],
+   "id": 44
+  },
+  "audit": {
+   "t": "A design-first approach would require platforms to answer the same questions an auditor would ask: what requirement applies, what evidence proves it, who reviewed the evidence, what failed, and what changed because of the finding. An overall accuracy figure, verbal assurances, or informal promises to fix issues later count as weak evidence.",
+   "s": [
+    "S22"
+   ],
+   "id": 45
+  },
+  "memos": [
+   {
+    "title": "Regulate the objective, not only the feature",
+    "body": {
+     "t": "Current design laws switch individual features on or off. The simulation in this project shows that removing a single ranking signal does not remove the behavior, because correlated signals take its place. A memo would recommend that regulators examine what a ranking system is optimized to maximize for minors and require outcome measures, such as the share of distress-related content in a minor's top recommendations, rather than feature lists alone.",
+     "s": []
+    }
+   },
+   {
+    "title": "Set a testing standard for explanations",
+    "body": {
+     "t": "The DSA requires platforms to explain their recommender systems but does not say how an explanation should be judged. A memo would propose adopting the five evaluation tests, fidelity, faithfulness, completeness, stability, and human usefulness, as the standard an explanation must meet before it counts as evidence of compliance.",
+     "s": []
+    }
+   },
+   {
+    "title": "Require design-stage review for systems that rank content for minors",
+    "body": {
+     "t": "Following the healthcare model, changes to ranking systems that reach minors would undergo documented, independent review before deployment rather than after harm, with audit evidence organized around requirements rather than assurances.",
+     "s": []
+    }
+   },
+   {
+    "title": "Extend independent data access beyond the EU",
+    "body": {
+     "t": "Every XAI method depends on access to the model or its data. A memo would examine how researcher and auditor access similar to the DSA's Article 40 could be adopted in the United States, so that outside parties can test ranking systems instead of relying on platform self-reporting.",
+     "s": []
+    }
+   }
+  ],
+  "takeaway": {
+   "t": "Access-based regulation is widespread, while design-based regulation remains rare, recent, and largely unproven, and almost none of it specifies how an explanation of a ranking system should be tested.",
+   "s": []
+  }
+ },
+ "technical": {
+  "q": "Can explainable AI show regulators how a ranking system actually works, and how far can those explanations be trusted?",
+  "intro": {
+   "t": "Because platforms do not make their ranking systems available for outside inspection, this project uses a simulated feed to demonstrate how explainable AI methods could be applied to engagement-based ranking and where they fall short. A gradient-boosted model was trained on 20,000 simulated post impressions to predict engagement, and then used to rank the feed of one simulated 14-year-old who has recently engaged with distress-related content. Because the data is simulated, the true drivers of engagement are known, which makes it possible to check the explanations against the truth.",
+   "s": [
+    "S28"
+   ],
+   "id": 46
+  },
+  "methods": [
+   {
+    "name": "LIME",
+    "what": {
+     "t": "Fits a simple linear model around one prediction by perturbing its inputs and watching how the output changes, producing an approximate reason for a single ranking.",
+     "s": []
+    },
+    "result": {
+     "t": "For the top-ranked post, LIME named the user's past engagement with the topic as the main reason in 39 of 40 reruns, but its simple model reproduced only about 62% of the ranker's local behavior, and it ranked \"hours since posted\" as the third most important factor, which SHAP did not.",
+     "s": [
+      "S28"
+     ],
+     "id": 47
+    }
+   },
+   {
+    "name": "SHAP",
+    "what": {
+     "t": "Divides a prediction among its input features using Shapley values from game theory, so that every feature's contribution adds up exactly to the final score.",
+     "s": []
+    },
+    "result": {
+     "t": "SHAP named the emotional intensity of the post as the largest contributor, nearly tied with the user's past engagement with the topic, and its contributions summed exactly to the model's score. Across the whole dataset, SHAP's ranking of features closely matched the true drivers of engagement (rank correlation 0.964).",
+     "s": [
+      "S28"
+     ],
+     "id": 48
+    }
+   },
+   {
+    "name": "Counterfactuals",
+    "what": {
+     "t": "Describe the smallest meaningful change that would produce a different outcome, which, under Dr. Bent's framing, must be actionable: within the person's control and achievable within the relevant time frame, and never involving attributes the person cannot change.",
+     "s": [
+      "S21"
+     ],
+     "id": 49
+    },
+    "result": {
+     "t": "No change to the teen's own engagement history alone could remove the top post from her top three; even with no past engagement with the topic at all, it would still rank #2. It only fell out of the top three when the post's emotional intensity was reduced from 0.86 to 0.05, a property of the content and the ranking, not of the user.",
+     "s": [
+      "S28",
+      "S21"
+     ],
+     "id": 50
+    }
+   }
+  ],
+  "proxy": {
+   "t": "Distress-related posts made up 15.7% of all simulated posts but 47.4% of the top 10% of rankings, even though the model was never told which posts were distress-related; it learned to favor them because they produce engagement.",
+   "s": [
+    "S28"
+   ],
+   "id": 51
+  },
+  "design_cf": {
+   "t": "Retraining the ranker without emotional intensity as a signal lowered the share of distress-related posts in the top 10% from 47.4% to 38.0%, but the same two distress-related posts remained at the top of the teen's feed, because correlated signals such as watch completion and comment rate carried the same information.",
+   "s": [
+    "S28"
+   ],
+   "id": 52
+  },
+  "tests_intro": {
+   "t": "Dr. Bent's evaluation framework asks that tests match the explanation's intended claim and its audience. Each test below is scored on the simulated demo.",
+   "s": [
+    "S20"
+   ],
+   "id": 53
+  },
+  "tests": [
+   {
+    "name": "Fidelity",
+    "score": "Pass / Partial",
+    "body": {
+     "t": "SHAP passes: its contributions reproduce the model's score exactly. LIME is partial: its local surrogate explained about 62% of the model's behavior around the post.",
+     "s": [
+      "S28",
+      "S20"
+     ],
+     "id": 54
+    }
+   },
+   {
+    "name": "Faithfulness",
+    "score": "Pass",
+    "body": {
+     "t": "Removing the two features SHAP ranked highest lowered the post's score by 0.354, compared with an average of 0.066 when two features were removed in random order, indicating that SHAP identified features the model actually uses.",
+     "s": [
+      "S28",
+      "S20"
+     ],
+     "id": 55
+    }
+   },
+   {
+    "name": "Completeness",
+    "score": "Fail (platform-style)",
+    "body": {
+     "t": "SHAP's top three features accounted for 84.4% of the post's ranking. A platform-style one-line reason, \"This video is similar to content you've interacted with,\" accounts for only 35.1%, leaving 64.9% unexplained, including the post's emotional intensity, its single largest driver.",
+     "s": [
+      "S28",
+      "S20"
+     ],
+     "id": 56
+    }
+   },
+   {
+    "name": "Stability",
+    "score": "Pass (in this case)",
+    "body": {
+     "t": "LIME's top reason held in 39 of 40 reruns and did not change across kernel widths, and SHAP's top three features did not change when the post was altered slightly. Stability has to be tested rather than assumed, because LIME's sampling makes every run slightly different.",
+     "s": [
+      "S28",
+      "S20"
+     ],
+     "id": 57
+    }
+   },
+   {
+    "name": "Human usefulness",
+    "score": "Fail",
+    "body": {
+     "t": "Not tested with real users in this project. Judged against the intended audience, a SHAP value in probability units is not something a 14-year-old or a legislator can act on, and the only actionable counterfactual places the burden on the child rather than on the platform.",
+     "s": [
+      "S28",
+      "S20",
+      "S21"
+     ],
+     "id": 58
+    }
+   }
+  ],
+  "takeaway": {
+   "t": "Explanations of ranking systems are possible but fragile, and a regulator who accepts an explanation without testing it is accepting weak evidence.",
+   "s": []
+  }
+ },
+ "public": {
+  "q": "What do platforms tell users about why they see what they see, and how does that compare with what is actually happening?",
+  "intro": {
+   "t": "Platforms already offer users some explanation of their feeds. These features are the point at which explainable AI actually reaches the public, so they are the most direct test of whether explanations serve the people they are meant for.",
+   "s": []
+  },
+  "features": [
+   {
+    "name": "TikTok, \"Why this video\"",
+    "says": {
+     "t": "Launched in December 2022, it gives short reasons such as that a video is similar to content the user has interacted with or searched for, is from an account the user follows, is popular, or was posted nearby.",
+     "s": [
+      "S19"
+     ],
+     "id": 59
+    },
+    "limits": {
+     "t": "TikTok stated that the feature would not reveal major details about how its algorithm works and would offer only a hint about why a video was shown.",
+     "s": [
+      "S19"
+     ],
+     "id": 60
+    }
+   },
+   {
+    "name": "Meta, \"Why am I seeing this?\" and system cards",
+    "says": {
+     "t": "In June 2023, Meta published 22 system cards describing how AI ranks content across Facebook and Instagram and expanded \"Why am I seeing this?\" to Reels and Explore, showing which past activity may have influenced a recommendation.",
+     "s": [
+      "S18"
+     ],
+     "id": 61
+    },
+    "limits": {
+     "t": "Meta states that it cannot disclose every signal, particularly those used to keep harmful content out of feeds, and acknowledges that publishing information online does not guarantee that people will find it.",
+     "s": [
+      "S18"
+     ],
+     "id": 62
+    }
+   },
+   {
+    "name": "EU non-profiling feeds",
+    "says": {
+     "t": "Very large platforms in the EU must offer at least one recommender option that is not based on profiling, reachable from the same interface as the main feed.",
+     "s": [
+      "S10"
+     ],
+     "id": 63
+    },
+    "limits": {
+     "t": "Researchers have cited a civil society complaint alleging that Meta is not meaningfully implementing these recommender requirements on Facebook and Instagram.",
+     "s": [
+      "S11"
+     ],
+     "id": 64
+    }
+   }
+  ],
+  "gap": {
+   "t": "In the simulation, the reason a platform would most likely show, \"This video is similar to content you've interacted with,\" is accurate, but it accounts for only 35.1% of why the top post was ranked first. It does not tell the user that the post's emotional intensity was the largest single factor, and the only change it implies she can make, engaging less with similar content, would not remove the post from the top of her feed.",
+   "s": [
+    "S28"
+   ],
+   "id": 65
+  },
+  "stakes": [
+   {
+    "t": "In March 2026, two juries reached verdicts against Meta within a day of each other: a Los Angeles jury found Meta and YouTube negligent in a case focused on design features such as infinite scroll and autoplay, and a New Mexico jury imposed a $375 million penalty in a case that included algorithms prioritizing sensational or harmful content.",
+    "s": [
+     "S16",
+     "S17"
+    ],
+    "id": 66
+   },
+   {
+    "t": "These dynamics are not limited to young users, as Facebook's engagement-based systems similarly amplified hate speech against the Rohingya in Myanmar in the years before the 2017 genocide, while the company's later fixes, such as banning accounts and adding moderators, left the ranking algorithm itself untouched.",
+    "s": [
+     "S23",
+     "S24"
+    ],
+    "id": 67
+   }
+  ],
+  "takeaway": {
+   "t": "The explanations users receive today are true but partial, and they describe the user's own behavior far more than they describe the design choices that shape the feed.",
+   "s": []
+  }
+ },
+ "conclusion": {
+  "t": "Taken together, these four lenses show that the harms of engagement-based ranking are foreseeable, that current regulation largely addresses who is exposed rather than how exposure is designed, and that explainable AI can make these systems inspectable only if explanations are tested against standards that match the people relying on them. Every meaningful correction to date has come after someone was harmed, and the tools to look before that point already exist.",
+  "s": []
+ },
+ "limitations": [
+  {
+   "t": "The feed, users, and ranking model are simulated. Real platform ranking systems are not available for outside inspection, so the demo shows how the methods behave on a system with known properties rather than what any specific platform does.",
+   "s": []
+  },
+  {
+   "t": "Human usefulness was assessed against the stated audience rather than tested with real users.",
+   "s": []
+  },
+  {
+   "t": "Policy statuses are accurate as of October 2026 and are changing quickly; several measures are under legal challenge or pending.",
+   "s": []
+  },
+  {
+   "t": "Several policy summaries rely on reputable secondary sources (law firm analyses and news reporting) rather than the full legal text; these are cited individually in the source ledger.",
+   "s": []
+  }
+ ],
+ "sources": {
+  "S1": {
+   "title": "Express & Star (PA Media), \"Molly Russell: What we learned from the inquest into death of teen who viewed online content,\" Sept. 2022",
+   "url": "https://www.expressandstar.com/uk-news/molly-russell-what-we-learned-from-the-inquest-into-death-of-teen-who-viewed-online-content-5900044"
+  },
+  "S2": {
+   "title": "Children's Commissioner for England, \"The Children's Commissioner responds to the Molly Russell inquest conclusion,\" Sept. 30, 2022",
+   "url": "https://www.childrenscommissioner.gov.uk/2022/09/30/the-childrens-commissioner-responds-to-the-molly-russell-inquest-conclusion"
+  },
+  "S3": {
+   "title": "News-Medical, \"United States Surgeon General's Advisory highlights social media's effects on youth mental health,\" May 25, 2023",
+   "url": "https://www.news-medical.net/news/20230525/United-States-Surgeon-Generale28099s-Advisory-highlights-social-mediae28099s-effects-on-youth-mental-health.aspx"
+  },
+  "S4": {
+   "title": "TechCrunch, \"Social media bans for children: a list of countries,\" Apr. 8, 2026",
+   "url": "https://techcrunch.com/2026/04/08/social-media-ban-children-countries-list"
+  },
+  "S5": {
+   "title": "AMES Australia, \"New social media minimum age law\"",
+   "url": "https://www.ames.net.au/blogs/new-social-media-minimum-age-law"
+  },
+  "S6": {
+   "title": "Office of the New York State Attorney General, \"Attorney General James and Governor Hochul Release Final SAFE for Kids Act Rules,\" July 2026",
+   "url": "https://ag.ny.gov/press-release/2026/attorney-general-james-and-governor-hochul-release-final-safe-kids-act-rules"
+  },
+  "S7": {
+   "title": "Hunton Andrews Kurth, \"Ninth Circuit Upholds Addictive Social Media Feed Ban and Default Privacy Settings for Minors in California's Protecting Our Kids from Social Media Addiction Act,\" Sept. 2025",
+   "url": "https://www.hunton.com/privacy-and-cybersecurity-law-blog/ninth-circuit-upholds-addictive-social-media-feed-ban-and-default-privacy-settings-for-minors-in-californias-protecting-our-kids-from-social-media-addiction-act"
+  },
+  "S8": {
+   "title": "White & Case, \"UK Online Safety Act: Protection of Children Codes come into force,\" July 2025",
+   "url": "https://www.whitecase.com/insight-alert/uk-online-safety-act-protection-children-codes-come-force"
+  },
+  "S9": {
+   "title": "Digital Services Act, Article 27 (Recommender system transparency), via Presencis",
+   "url": "https://presencis.com/regulations/dsa/article-27/"
+  },
+  "S10": {
+   "title": "Digital Services Act, Article 38 (Recommender systems of very large platforms), via Presencis",
+   "url": "https://presencis.com/regulations/dsa/article-38/"
+  },
+  "S11": {
+   "title": "DSA Observatory, \"Making Recommender Systems Work for People: Turning the DSA's Potential into Practice\"",
+   "url": "https://dsa-observatory.eu/?p=2051"
+  },
+  "S12": {
+   "title": "CADE Project, \"EU guidelines on keeping children safe online under the Digital Services Act,\" Oct. 2025",
+   "url": "https://cadeproject.org/updates/eu-guidelines-on-keeping-children-safe-online-under-the-digital-services-act/"
+  },
+  "S13": {
+   "title": "Hogan Lovells, \"The EU AI Act: Prohibited practices and AI literacy requirements take effect,\" 2025",
+   "url": "https://hlc.com/en/publications/the-eu-ai-act-prohibited-practices-and-ai-literacy-requirements-take-effect"
+  },
+  "S14": {
+   "title": "European Commission, \"Commission adopts delegated act on data access under the Digital Services Act,\" July 2, 2025",
+   "url": "https://digital-strategy.ec.europa.eu/en/news/commission-adopts-delegated-act-data-access-under-digital-services-act"
+  },
+  "S15": {
+   "title": "IAPP, \"US Senate committee approves KOSA, children's AI safety bills,\" Aug. 6, 2026",
+   "url": "https://iapp.org/news/a/us-senate-committee-approves-kosa-children-s-ai-safety-bills"
+  },
+  "S16": {
+   "title": "Associated Press via KPRC Click2Houston, \"Meta appeals landmark jury verdict that found it to blame for social media addiction for young users,\" July 10, 2026",
+   "url": "https://www.click2houston.com/business/2026/07/10/meta-appeals-landmark-jury-verdict-that-found-it-to-blame-for-social-media-addiction-for-young-users/"
+  },
+  "S17": {
+   "title": "Associated Press via ABC7 News, \"New Mexico jury says Meta harms children's mental health and safety, violating state law,\" Mar. 24, 2026",
+   "url": "https://abc7news.com/post/jury-deliberating-landmark-new-mexico-trial-childrens-safety-risks-meta/18764244/"
+  },
+  "S18": {
+   "title": "Meta, \"How AI Influences What You See on Facebook and Instagram,\" June 29, 2023",
+   "url": "https://about.fb.com/news/2023/06/how-ai-ranks-content-on-facebook-and-instagram/"
+  },
+  "S19": {
+   "title": "Popular Science, \"TikTok to tell users the 'why' behind 'For You',\" Dec. 21, 2022",
+   "url": "https://www.popsci.com/technology/tiktok-why-this-video/"
+  },
+  "S20": {
+   "title": "B. Bent, Explainable AI Workbook, Unit 2 Ch. 9, \"Evaluating Explanations\"",
+   "url": "https://explainableaiworkbook.com/02-explainable-machine-learning/09-evaluating-explanations"
+  },
+  "S21": {
+   "title": "B. Bent, Explainable AI Workbook, \"Counterfactual Explanations\"",
+   "url": "https://explainableaiworkbook.com/02-explainable-machine-learning/03-example-based-explanations/02-counterfactual-explanations"
+  },
+  "S22": {
+   "title": "B. Bent, Explainable AI Workbook, Unit 6, \"Auditability\"",
+   "url": "https://explainableaiworkbook.com/06-transparent-ai/02-accountability/01-auditability"
+  },
+  "S23": {
+   "title": "D. McLaughlin, \"Case Study: Facebook's Role in the 2017 Rohingya Genocide,\" SCISOC 585, Duke University, Apr. 2026",
+   "url": null
+  },
+  "S24": {
+   "title": "Amnesty International, \"Myanmar: Facebook's Systems Promoted Violence Against Rohingya; Meta Owes Reparations,\" Sept. 29, 2022",
+   "url": "https://www.amnesty.org/en/latest/news/2022/09/myanmar-facebooks-systems-promoted-violence-against-rohingya-meta-owes-reparations-new-report/"
+  },
+  "S25": {
+   "title": "T. L. Beauchamp and J. F. Childress, Principles of Biomedical Ethics (Oxford University Press)",
+   "url": null
+  },
+  "S26": {
+   "title": "D. McLaughlin, \"The Crisis of Artificial Companionship: When Simulated Empathy Obscures Harm,\" SCISOC 690, Duke University, Dec. 2025",
+   "url": null
+  },
+  "S27": {
+   "title": "Coalition for Health AI (CHAI), Assurance Standards Guide: AI lifecycle and core principles (as summarized in AE+ Summer Capstone 2026 notes, Duke)",
+   "url": "https://www.chai.org"
+  },
+  "S28": {
+   "title": "Original analysis: simulated engagement-ranking demo (analysis/feed_demo.py; results/feed_results.json). Simulated data only.",
+   "url": null
+  }
+ },
+ "ledger": [
+  {
+   "id": 1,
+   "text": "In November 2017, Molly Russell, a 14-year-old from London, took her own life after months of viewing self-harm and suicide content on Instagram and Pinterest.",
+   "sources": [
+    "S1",
+    "S2"
+   ],
+   "where": "Site: Hook; Poster: Hook"
+  },
+  {
+   "id": 2,
+   "text": "During her inquest, it was revealed that in the six months before her death, Molly saved, liked, or shared 16,300 posts on Instagram, 2,100 of which were related to depression, self-harm, or suicide, averaging around 130 interactions a day.",
+   "sources": [
+    "S1"
+   ],
+   "where": "Site: Hook; Poster: Hook stat callouts"
+  },
+  {
+   "id": 3,
+   "text": "Pinterest went as far as emailing her recommendations with subject lines such as \"10 depression pins you might like.\"",
+   "sources": [
+    "S1"
+   ],
+   "where": "Site: Hook; Poster: Hook"
+  },
+  {
+   "id": 4,
+   "text": "These posts were part of a larger algorithmic design process that was created to function and thrive by pushing for more engagement from its users, which is why Molly continued to receive this harmful content.",
+   "sources": [
+    "S2"
+   ],
+   "where": "Site: Hook; Poster: Hook"
+  },
+  {
+   "id": 5,
+   "text": "Molly's case is not isolated, as up to 95% of adolescents aged 13 to 17 use social media, and the U.S. Surgeon General has found that those who spend more than three hours a day on these platforms face roughly double the risk of depression and anxiety symptoms, while the average teen spends 3.5 hours a day.",
+   "sources": [
+    "S3"
+   ],
+   "where": "Site: Hook; Poster: Hook stat callouts"
+  },
+  {
+   "id": 6,
+   "text": "The harms produced by engagement-based ranking cannot be understood solely as technical failures, as they reflect value choices embedded in how these systems are designed and what they are built to prioritize. The four principles of biomedical ethics, autonomy, beneficence, nonmaleficence, and justice, provide a framework for evaluating these choices and identifying where they fall short.",
+   "sources": [
+    "S25",
+    "S26"
+   ],
+   "where": "Site: Philosophical lens intro"
+  },
+  {
+   "id": 7,
+   "text": "Engagement-based ranking learns which content a user is least able to look away from and continues to supply it, which undermines the conditions that make voluntary choice possible, particularly for adolescents whose capacity for self-regulation is still developing. This builds on the argument, developed in earlier work on AI companions, that autonomy is not merely a choice but the set of conditions that make choice possible.",
+   "sources": [
+    "S25",
+    "S26"
+   ],
+   "where": "Site: Philosophical lens, Autonomy; Poster: Philosophical quadrant"
+  },
+  {
+   "id": 8,
+   "text": "These systems are optimized to maximize time spent and interaction rather than to benefit the user, meaning that any good the user receives is incidental to the system's actual objective. Meta itself describes its ranking as predicting how valuable content may be to a user so it can be shown sooner, combining predictions drawn from behavioral signals, such as whether a user is likely to share a post, with survey feedback.",
+   "sources": [
+    "S25",
+    "S18"
+   ],
+   "where": "Site: Philosophical lens, Beneficence; Poster: Philosophical quadrant"
+  },
+  {
+   "id": 9,
+   "text": "When platforms are aware that their ranking systems amplify harmful content to vulnerable users and continue to deploy them without meaningful safeguards, the resulting harm is foreseeable and therefore preventable. In Molly Russell's case, the coroner's findings pointed to the platforms' engagement-driven algorithms recommending an increasing volume of harmful material to her.",
+   "sources": [
+    "S25",
+    "S2",
+    "S26"
+   ],
+   "where": "Site: Philosophical lens, Nonmaleficence; Poster: Philosophical quadrant"
+  },
+  {
+   "id": 10,
+   "text": "The consequences of engagement-driven design do not fall evenly, as they are concentrated on those least able to protect themselves, including minors, users experiencing psychological distress, and populations in regions with limited regulatory oversight. In Myanmar, Facebook deployed the same engagement-maximizing systems it used everywhere else in a country where it functioned as the primary source of information, with catastrophic consequences for the Rohingya.",
+   "sources": [
+    "S25",
+    "S23",
+    "S24"
+   ],
+   "where": "Site: Philosophical lens, Justice; Poster: Philosophical quadrant"
+  },
+  {
+   "id": 11,
+   "text": "In effect since December 10, 2025.",
+   "sources": [
+    "S5"
+   ],
+   "where": "Site: Policy, Australia, status; Poster: Policy table"
+  },
+  {
+   "id": 12,
+   "text": "Account access for users under 16 on platforms including Facebook, Instagram, Reddit, Snapchat, Threads, TikTok, X, and YouTube; most messaging, gaming, health, and education services are not covered.",
+   "sources": [
+    "S5"
+   ],
+   "where": "Site: Policy, Australia, targets"
+  },
+  {
+   "id": 13,
+   "text": "Platforms must take steps to keep under-16s off their services and cannot rely on users self-reporting their age, with fines of up to AUD 49.5 million.",
+   "sources": [
+    "S4"
+   ],
+   "where": "Site: Policy, Australia, engineering obligation"
+  },
+  {
+   "id": 14,
+   "text": "Moderate to low. Age assurance raises accuracy and privacy concerns, and no measured outcome data from the ban has yet been reported.",
+   "sources": [
+    "S4"
+   ],
+   "where": "Site: Policy, Australia, feasibility"
+  },
+  {
+   "id": 15,
+   "text": "Denmark (under 15) and Malaysia (under 16) planned; France (under 15) passed its lower house; Greece (under 15) announced for January 2027; Spain and Indonesia (under 16) announced; the UK is consulting.",
+   "sources": [
+    "S4"
+   ],
+   "where": "Site: Policy, planned bans, status; Poster: Policy table"
+  },
+  {
+   "id": 16,
+   "text": "Account access by age. Greece cites anxiety, sleep problems, and addictive platform design as its reasons, yet regulates access rather than the design itself.",
+   "sources": [
+    "S4"
+   ],
+   "where": "Site: Policy, planned bans, targets"
+  },
+  {
+   "id": 17,
+   "text": "Uncertain. Critics including Amnesty Tech argue that such bans are ineffective and ignore how young people actually use technology, and privacy advocates raise concerns about invasive age verification.",
+   "sources": [
+    "S4"
+   ],
+   "where": "Site: Policy, planned bans, feasibility"
+  },
+  {
+   "id": 18,
+   "text": "Final rules released in July 2026; the law takes effect January 25, 2027.",
+   "sources": [
+    "S6"
+   ],
+   "where": "Site: Policy, New York, status; Poster: Policy table"
+  },
+  {
+   "id": 19,
+   "text": "Algorithmically personalized \"addictive feeds\" and notifications between midnight and 6 a.m. for users under 18, unless a parent consents; applies to platforms where users spend at least 20% of their time on such feeds.",
+   "sources": [
+    "S6"
+   ],
+   "where": "Site: Policy, New York, targets"
+  },
+  {
+   "id": 20,
+   "text": "Age assurance with at least one option other than government ID, tested annually with results retained for 10 years; a non-personalized feed for minors by default; data minimization for age and consent data.",
+   "sources": [
+    "S6"
+   ],
+   "where": "Site: Policy, New York, engineering obligation"
+  },
+  {
+   "id": 21,
+   "text": "In effect; on September 9, 2025, the Ninth Circuit upheld the addictive feed and private-by-default provisions while striking the limit on showing engagement counts. The case returns to the district court for trial.",
+   "sources": [
+    "S7"
+   ],
+   "where": "Site: Policy, California, status; Poster: Policy table"
+  },
+  {
+   "id": 22,
+   "text": "Addictive feeds, defined as feeds where content is recommended, selected, or prioritized based on information about the user, offered to minors without verifiable parental consent; private-by-default accounts.",
+   "sources": [
+    "S7"
+   ],
+   "where": "Site: Policy, California, targets"
+  },
+  {
+   "id": 23,
+   "text": "Contested in court; the provision restricting engagement counts was found unconstitutional, which shows the legal limits of regulating interface design features one at a time.",
+   "sources": [
+    "S7"
+   ],
+   "where": "Site: Policy, California, feasibility"
+  },
+  {
+   "id": 24,
+   "text": "In force since July 25, 2025.",
+   "sources": [
+    "S8"
+   ],
+   "where": "Site: Policy, UK, status; Poster: Policy table"
+  },
+  {
+   "id": 25,
+   "text": "Content recommender systems on services assessed as medium or high risk must exclude potentially harmful content from children's feeds or give it low prominence; annual children's risk assessments are required.",
+   "sources": [
+    "S8"
+   ],
+   "where": "Site: Policy, UK, targets"
+  },
+  {
+   "id": 26,
+   "text": "Harmful content classifiers wired into the recommender, a yearly children's risk assessment, highly effective age assurance where priority harmful content is present, and reporting and complaints tools.",
+   "sources": [
+    "S8"
+   ],
+   "where": "Site: Policy, UK, engineering obligation"
+  },
+  {
+   "id": 27,
+   "text": "In force for online platforms; Article 38 applies to very large online platforms.",
+   "sources": [
+    "S9",
+    "S10"
+   ],
+   "where": "Site: Policy, DSA, status"
+  },
+  {
+   "id": 28,
+   "text": "Platforms must describe, in plain and intelligible language, the main parameters of their recommender systems, including the most significant criteria and the reasons for their relative importance, and very large platforms must offer at least one recommender option not based on profiling.",
+   "sources": [
+    "S9",
+    "S10"
+   ],
+   "where": "Site: Policy, DSA, targets; Poster: Policy table"
+  },
+  {
+   "id": 29,
+   "text": "Yes, at the level of the system as a whole: the \"main parameters\" requirement is a global explanation requirement. However, the requirement can be interpreted in multiple ways, and the first round of DSA audits showed platforms defining it differently.",
+   "sources": [
+    "S9",
+    "S11"
+   ],
+   "where": "Site: Policy, DSA, XAI requirement; Poster: Policy table"
+  },
+  {
+   "id": 30,
+   "text": "Feasible, but without a shared standard, disclosures cannot be compared across platforms; researchers have called for specific inputs and weights to be disclosed.",
+   "sources": [
+    "S11"
+   ],
+   "where": "Site: Policy, DSA, feasibility"
+  },
+  {
+   "id": 31,
+   "text": "The delegated act on researcher data access was adopted July 2, 2025, with the first researchers expected to be vetted from October 2025.",
+   "sources": [
+    "S14"
+   ],
+   "where": "Site: Policy, DSA risk, status"
+  },
+  {
+   "id": 32,
+   "text": "Very large platforms must assess and mitigate systemic risks, undergo independent audits, and give vetted researchers access to internal data for studying systemic risks in the EU.",
+   "sources": [
+    "S11",
+    "S14"
+   ],
+   "where": "Site: Policy, DSA risk, targets"
+  },
+  {
+   "id": 33,
+   "text": "Promising but early; researchers report inconsistent access to data and a lack of validated metrics for harm to at-risk populations.",
+   "sources": [
+    "S11"
+   ],
+   "where": "Site: Policy, DSA risk, feasibility"
+  },
+  {
+   "id": 34,
+   "text": "Adopted by the European Commission in July 2025.",
+   "sources": [
+    "S12"
+   ],
+   "where": "Site: Policy, DSA minors, status; Poster: Policy table"
+  },
+  {
+   "id": 35,
+   "text": "Children should be able to adjust what they see, reset their feed, and understand why specific content is recommended; features that promote overuse, such as infinite scrolling, streaks, and daily rewards, should be avoided.",
+   "sources": [
+    "S12"
+   ],
+   "where": "Site: Policy, DSA minors, targets; Poster: Policy table"
+  },
+  {
+   "id": 36,
+   "text": "Prohibitions have applied since February 2, 2025, with national enforcement powers from August 2, 2025 and fines of up to EUR 35 million or 7% of worldwide turnover.",
+   "sources": [
+    "S13"
+   ],
+   "where": "Site: Policy, AI Act, status"
+  },
+  {
+   "id": 37,
+   "text": "AI systems that exploit vulnerabilities linked to age, disability, or social or economic circumstances to materially alter a person's behaviour in a way that causes, or is reasonably likely to cause, significant harm.",
+   "sources": [
+    "S13"
+   ],
+   "where": "Site: Policy, AI Act, targets; Poster: Policy table"
+  },
+  {
+   "id": 38,
+   "text": "Approved by the Senate Commerce Committee on August 5, 2026 and awaiting a full Senate vote; a prior version passed the Senate 91-3.",
+   "sources": [
+    "S15"
+   ],
+   "where": "Site: Policy, KOSA, status; Poster: Policy table"
+  },
+  {
+   "id": 39,
+   "text": "A duty of care requiring companies to take reasonable care to avoid creating harm to children, limits on addictive design features, and protective default settings for minors.",
+   "sources": [
+    "S15"
+   ],
+   "where": "Site: Policy, KOSA, targets"
+  },
+  {
+   "id": 40,
+   "text": "In March 2026, a jury found Meta and YouTube negligent; it awarded $3 million in compensatory damages and recommended $3 million in punitive damages. Meta filed a notice of appeal in July 2026.",
+   "sources": [
+    "S16"
+   ],
+   "where": "Site: Policy, KGM, status; Site: Public lens; Poster: Policy table"
+  },
+  {
+   "id": 41,
+   "text": "Design features such as infinite scroll, endless feeds, and autoplay, which plaintiffs targeted to sidestep Section 230 protections for third-party content.",
+   "sources": [
+    "S16"
+   ],
+   "where": "Site: Policy, KGM, targets"
+  },
+  {
+   "id": 42,
+   "text": "On March 24, 2026, a jury found that Meta violated New Mexico's Unfair Practices Act and imposed a $375 million penalty; Meta says it will appeal.",
+   "sources": [
+    "S17"
+   ],
+   "where": "Site: Policy, New Mexico, status; Poster: Policy table"
+  },
+  {
+   "id": 43,
+   "text": "Among the practices at issue were algorithms that prioritized sensational or harmful content, alleged addictive features, and public safety statements the jury considered potentially misleading.",
+   "sources": [
+    "S17"
+   ],
+   "where": "Site: Policy, New Mexico, targets"
+  },
+  {
+   "id": 44,
+   "text": "Healthcare offers a useful comparison. The Coalition for Health AI's lifecycle places designing the AI system as a stage that comes before the system is engineered, piloted, or deployed, and stresses independent review to uncover risks prior to deployment. Social media ranking systems face no equivalent requirement, which means they are evaluated only after harm has already occurred, most often through litigation.",
+   "sources": [
+    "S27"
+   ],
+   "where": "Site: Policy, Toward design-first policy; Poster: Policy quadrant"
+  },
+  {
+   "id": 45,
+   "text": "A design-first approach would require platforms to answer the same questions an auditor would ask: what requirement applies, what evidence proves it, who reviewed the evidence, what failed, and what changed because of the finding. An overall accuracy figure, verbal assurances, or informal promises to fix issues later count as weak evidence.",
+   "sources": [
+    "S22"
+   ],
+   "where": "Site: Policy, Toward design-first policy"
+  },
+  {
+   "id": 46,
+   "text": "Because platforms do not make their ranking systems available for outside inspection, this project uses a simulated feed to demonstrate how explainable AI methods could be applied to engagement-based ranking and where they fall short. A gradient-boosted model was trained on 20,000 simulated post impressions to predict engagement, and then used to rank the feed of one simulated 14-year-old who has recently engaged with distress-related content. Because the data is simulated, the true drivers of engagement are known, which makes it possible to check the explanations against the truth.",
+   "sources": [
+    "S28"
+   ],
+   "where": "Site: Technical lens intro; Poster: Technical quadrant"
+  },
+  {
+   "id": 47,
+   "text": "For the top-ranked post, LIME named the user's past engagement with the topic as the main reason in 39 of 40 reruns, but its simple model reproduced only about 62% of the ranker's local behavior, and it ranked \"hours since posted\" as the third most important factor, which SHAP did not.",
+   "sources": [
+    "S28"
+   ],
+   "where": "Site: Technical lens, LIME; Poster: Technical quadrant"
+  },
+  {
+   "id": 48,
+   "text": "SHAP named the emotional intensity of the post as the largest contributor, nearly tied with the user's past engagement with the topic, and its contributions summed exactly to the model's score. Across the whole dataset, SHAP's ranking of features closely matched the true drivers of engagement (rank correlation 0.964).",
+   "sources": [
+    "S28"
+   ],
+   "where": "Site: Technical lens, SHAP; Poster: Technical quadrant"
+  },
+  {
+   "id": 49,
+   "text": "Describe the smallest meaningful change that would produce a different outcome, which, under Dr. Bent's framing, must be actionable: within the person's control and achievable within the relevant time frame, and never involving attributes the person cannot change.",
+   "sources": [
+    "S21"
+   ],
+   "where": "Site: Technical lens, Counterfactuals"
+  },
+  {
+   "id": 50,
+   "text": "No change to the teen's own engagement history alone could remove the top post from her top three; even with no past engagement with the topic at all, it would still rank #2. It only fell out of the top three when the post's emotional intensity was reduced from 0.86 to 0.05, a property of the content and the ranking, not of the user.",
+   "sources": [
+    "S28",
+    "S21"
+   ],
+   "where": "Site: Technical lens, Counterfactuals; Poster: Technical quadrant"
+  },
+  {
+   "id": 51,
+   "text": "Distress-related posts made up 15.7% of all simulated posts but 47.4% of the top 10% of rankings, even though the model was never told which posts were distress-related; it learned to favor them because they produce engagement.",
+   "sources": [
+    "S28"
+   ],
+   "where": "Site: Technical lens, proxy finding; Poster: Technical quadrant headline"
+  },
+  {
+   "id": 52,
+   "text": "Retraining the ranker without emotional intensity as a signal lowered the share of distress-related posts in the top 10% from 47.4% to 38.0%, but the same two distress-related posts remained at the top of the teen's feed, because correlated signals such as watch completion and comment rate carried the same information.",
+   "sources": [
+    "S28"
+   ],
+   "where": "Site: Technical lens, design-side counterfactual; Poster: Technical quadrant"
+  },
+  {
+   "id": 53,
+   "text": "Dr. Bent's evaluation framework asks that tests match the explanation's intended claim and its audience. Each test below is scored on the simulated demo.",
+   "sources": [
+    "S20"
+   ],
+   "where": "Site: Technical lens, five tests intro"
+  },
+  {
+   "id": 54,
+   "text": "SHAP passes: its contributions reproduce the model's score exactly. LIME is partial: its local surrogate explained about 62% of the model's behavior around the post.",
+   "sources": [
+    "S28",
+    "S20"
+   ],
+   "where": "Site: Technical lens, Fidelity; Poster: five tests scorecard"
+  },
+  {
+   "id": 55,
+   "text": "Removing the two features SHAP ranked highest lowered the post's score by 0.354, compared with an average of 0.066 when two features were removed in random order, indicating that SHAP identified features the model actually uses.",
+   "sources": [
+    "S28",
+    "S20"
+   ],
+   "where": "Site: Technical lens, Faithfulness; Poster: five tests scorecard"
+  },
+  {
+   "id": 56,
+   "text": "SHAP's top three features accounted for 84.4% of the post's ranking. A platform-style one-line reason, \"This video is similar to content you've interacted with,\" accounts for only 35.1%, leaving 64.9% unexplained, including the post's emotional intensity, its single largest driver.",
+   "sources": [
+    "S28",
+    "S20"
+   ],
+   "where": "Site: Technical lens, Completeness; Poster: five tests scorecard"
+  },
+  {
+   "id": 57,
+   "text": "LIME's top reason held in 39 of 40 reruns and did not change across kernel widths, and SHAP's top three features did not change when the post was altered slightly. Stability has to be tested rather than assumed, because LIME's sampling makes every run slightly different.",
+   "sources": [
+    "S28",
+    "S20"
+   ],
+   "where": "Site: Technical lens, Stability; Poster: five tests scorecard"
+  },
+  {
+   "id": 58,
+   "text": "Not tested with real users in this project. Judged against the intended audience, a SHAP value in probability units is not something a 14-year-old or a legislator can act on, and the only actionable counterfactual places the burden on the child rather than on the platform.",
+   "sources": [
+    "S28",
+    "S20",
+    "S21"
+   ],
+   "where": "Site: Technical lens, Human usefulness; Poster: five tests scorecard"
+  },
+  {
+   "id": 59,
+   "text": "Launched in December 2022, it gives short reasons such as that a video is similar to content the user has interacted with or searched for, is from an account the user follows, is popular, or was posted nearby.",
+   "sources": [
+    "S19"
+   ],
+   "where": "Site: Public lens, TikTok"
+  },
+  {
+   "id": 60,
+   "text": "TikTok stated that the feature would not reveal major details about how its algorithm works and would offer only a hint about why a video was shown.",
+   "sources": [
+    "S19"
+   ],
+   "where": "Site: Public lens, TikTok limits"
+  },
+  {
+   "id": 61,
+   "text": "In June 2023, Meta published 22 system cards describing how AI ranks content across Facebook and Instagram and expanded \"Why am I seeing this?\" to Reels and Explore, showing which past activity may have influenced a recommendation.",
+   "sources": [
+    "S18"
+   ],
+   "where": "Site: Public lens, Meta"
+  },
+  {
+   "id": 62,
+   "text": "Meta states that it cannot disclose every signal, particularly those used to keep harmful content out of feeds, and acknowledges that publishing information online does not guarantee that people will find it.",
+   "sources": [
+    "S18"
+   ],
+   "where": "Site: Public lens, Meta limits"
+  },
+  {
+   "id": 63,
+   "text": "Very large platforms in the EU must offer at least one recommender option that is not based on profiling, reachable from the same interface as the main feed.",
+   "sources": [
+    "S10"
+   ],
+   "where": "Site: Public lens, EU non-profiling option"
+  },
+  {
+   "id": 64,
+   "text": "Researchers have cited a civil society complaint alleging that Meta is not meaningfully implementing these recommender requirements on Facebook and Instagram.",
+   "sources": [
+    "S11"
+   ],
+   "where": "Site: Public lens, EU limits"
+  },
+  {
+   "id": 65,
+   "text": "In the simulation, the reason a platform would most likely show, \"This video is similar to content you've interacted with,\" is accurate, but it accounts for only 35.1% of why the top post was ranked first. It does not tell the user that the post's emotional intensity was the largest single factor, and the only change it implies she can make, engaging less with similar content, would not remove the post from the top of her feed.",
+   "sources": [
+    "S28"
+   ],
+   "where": "Site: Public lens, gap; Poster: Public quadrant"
+  },
+  {
+   "id": 66,
+   "text": "In March 2026, two juries reached verdicts against Meta within a day of each other: a Los Angeles jury found Meta and YouTube negligent in a case focused on design features such as infinite scroll and autoplay, and a New Mexico jury imposed a $375 million penalty in a case that included algorithms prioritizing sensational or harmful content.",
+   "sources": [
+    "S16",
+    "S17"
+   ],
+   "where": "Site: Public lens, stakes; Poster: Public quadrant"
+  },
+  {
+   "id": 67,
+   "text": "These dynamics are not limited to young users, as Facebook's engagement-based systems similarly amplified hate speech against the Rohingya in Myanmar in the years before the 2017 genocide, while the company's later fixes, such as banning accounts and adding moderators, left the ranking algorithm itself untouched.",
+   "sources": [
+    "S23",
+    "S24"
+   ],
+   "where": "Site: Public lens, Myanmar line"
+  }
+ ],
+ "demo": {
+  "feature_labels": {
+   "topic_history": "User's past engagement with this topic",
+   "emotional_intensity": "Emotional intensity of the post",
+   "reactions": "Reactions (popularity)",
+   "comment_rate": "Comment rate",
+   "watch_completion": "Avg. watch completion",
+   "from_followed": "From an account the user follows",
+   "hours_old": "Hours since posted"
+  },
+  "proxy_effect": {
+   "sensitive_share_overall_pct": 15.7,
+   "sensitive_share_top_decile_pct": 47.4
+  },
+  "feed": [
+   {
+    "rank": 1,
+    "name": "Post A",
+    "title": "Sad-edit video about feeling alone",
+    "distress_related": true,
+    "score": 0.964,
+    "features": {
+     "topic_history": 0.88,
+     "emotional_intensity": 0.86,
+     "reactions": 0.55,
+     "comment_rate": 0.48,
+     "watch_completion": 0.8,
+     "from_followed": 0,
+     "hours_old": 10
+    }
+   },
+   {
+    "rank": 2,
+    "name": "Post D",
+    "title": "Late-night venting post about feeling empty",
+    "distress_related": true,
+    "score": 0.932,
+    "features": {
+     "topic_history": 0.82,
+     "emotional_intensity": 0.92,
+     "reactions": 0.4,
+     "comment_rate": 0.62,
+     "watch_completion": 0.72,
+     "from_followed": 0,
+     "hours_old": 20
+    }
+   },
+   {
+    "rank": 3,
+    "name": "Post H",
+    "title": "Mental health hotline awareness post",
+    "distress_related": false,
+    "score": 0.592,
+    "features": {
+     "topic_history": 0.7,
+     "emotional_intensity": 0.4,
+     "reactions": 0.3,
+     "comment_rate": 0.2,
+     "watch_completion": 0.4,
+     "from_followed": 0,
+     "hours_old": 30
+    }
+   },
+   {
+    "rank": 4,
+    "name": "Post G",
+    "title": "Cousin's new puppy",
+    "distress_related": false,
+    "score": 0.583,
+    "features": {
+     "topic_history": 0.4,
+     "emotional_intensity": 0.3,
+     "reactions": 0.2,
+     "comment_rate": 0.25,
+     "watch_completion": 0.5,
+     "from_followed": 1,
+     "hours_old": 1
+    }
+   },
+   {
+    "rank": 5,
+    "name": "Post F",
+    "title": "Outrage clip about a celebrity",
+    "distress_related": false,
+    "score": 0.397,
+    "features": {
+     "topic_history": 0.2,
+     "emotional_intensity": 0.9,
+     "reactions": 0.8,
+     "comment_rate": 0.7,
+     "watch_completion": 0.6,
+     "from_followed": 0,
+     "hours_old": 5
+    }
+   },
+   {
+    "rank": 6,
+    "name": "Post C",
+    "title": "Viral dance challenge",
+    "distress_related": false,
+    "score": 0.348,
+    "features": {
+     "topic_history": 0.35,
+     "emotional_intensity": 0.35,
+     "reactions": 0.92,
+     "comment_rate": 0.3,
+     "watch_completion": 0.55,
+     "from_followed": 0,
+     "hours_old": 6
+    }
+   },
+   {
+    "rank": 7,
+    "name": "Post B",
+    "title": "Friend's soccer game photos",
+    "distress_related": false,
+    "score": 0.325,
+    "features": {
+     "topic_history": 0.3,
+     "emotional_intensity": 0.2,
+     "reactions": 0.25,
+     "comment_rate": 0.2,
+     "watch_completion": 0.45,
+     "from_followed": 1,
+     "hours_old": 3
+    }
+   },
+   {
+    "rank": 8,
+    "name": "Post E",
+    "title": "Study tips for finals",
+    "distress_related": false,
+    "score": 0.191,
+    "features": {
+     "topic_history": 0.25,
+     "emotional_intensity": 0.1,
+     "reactions": 0.45,
+     "comment_rate": 0.15,
+     "watch_completion": 0.4,
+     "from_followed": 0,
+     "hours_old": 2
+    }
+   }
+  ],
+  "top_post": "Post A",
+  "completeness": {
+   "shap_top_reason": "emotional_intensity",
+   "shap_top_reason_share_pct": 37.5,
+   "three_reason_share_pct": 84.4,
+   "platform_style_reason": "This video is similar to content you've interacted with",
+   "platform_style_reason_share_pct": 35.1,
+   "left_out_of_platform_reason_pct": 64.9
+  },
+  "shap": {
+   "per_post": {
+    "Post A": {
+     "topic_history": 0.20982175582371274,
+     "emotional_intensity": 0.22459899866855493,
+     "reactions": 0.02507307130334478,
+     "comment_rate": 0.01659360323512995,
+     "watch_completion": 0.07074671448888402,
+     "from_followed": -0.018693642237384945,
+     "hours_old": 0.03276752757560555
+    },
+    "Post B": {
+     "topic_history": -0.0797087297474026,
+     "emotional_intensity": -0.0992272029703004,
+     "reactions": -0.039799411997624885,
+     "comment_rate": -0.016557874817773842,
+     "watch_completion": 0.0049208979911726115,
+     "from_followed": 0.04065705158050666,
+     "hours_old": 0.11199638014345739
+    },
+    "Post C": {
+     "topic_history": -0.07631327902991701,
+     "emotional_intensity": -0.016025472338337475,
+     "reactions": -0.025283314719789424,
+     "comment_rate": -0.008652370975809483,
+     "watch_completion": 0.02106106672363891,
+     "from_followed": -0.052915184204398294,
+     "hours_old": 0.10303625298729308
+    },
+    "Post D": {
+     "topic_history": 0.2256795523953008,
+     "emotional_intensity": 0.18993548470612961,
+     "reactions": -0.008467243287672439,
+     "comment_rate": 0.036284569168647356,
+     "watch_completion": 0.07201737806443459,
+     "from_followed": -0.02224668955492185,
+     "hours_old": 0.03647845083360941
+    },
+    "Post E": {
+     "topic_history": -0.0790405249166604,
+     "emotional_intensity": -0.1540738535839861,
+     "reactions": -0.006494616722868164,
+     "comment_rate": -0.023492878128204425,
+     "watch_completion": -0.007499256356136368,
+     "from_followed": -0.023483710611236455,
+     "hours_old": 0.08274436555433981
+    },
+    "Post F": {
+     "topic_history": -0.14721505230740148,
+     "emotional_intensity": 0.30567271502224214,
+     "reactions": -0.0046797740947056524,
+     "comment_rate": -0.24476629988195847,
+     "watch_completion": 0.04595132889036715,
+     "from_followed": -0.028633651084793287,
+     "hours_old": 0.06769285867902458
+    },
+    "Post G": {
+     "topic_history": 0.03957360194784272,
+     "emotional_intensity": -0.05411866364675018,
+     "reactions": -0.0163557507726466,
+     "comment_rate": -0.007715778469079024,
+     "watch_completion": 0.004624805999641084,
+     "from_followed": 0.04522220877367739,
+     "hours_old": 0.16890592620504663
+    },
+    "Post H": {
+     "topic_history": 0.22195434496009134,
+     "emotional_intensity": 0.020603132362880267,
+     "reactions": -0.02722689159489533,
+     "comment_rate": -0.00832664347128625,
+     "watch_completion": -0.03292086965949239,
+     "from_followed": -0.02212255096551268,
+     "hours_old": 0.037090467338243116
+    }
+   }
+  },
+  "counterfactuals": {
+   "design_side": {
+    "new_feed": [
+     {
+      "rank": 1,
+      "name": "Post A",
+      "title": "Sad-edit video about feeling alone",
+      "distress_related": true
+     },
+     {
+      "rank": 2,
+      "name": "Post D",
+      "title": "Late-night venting post about feeling empty",
+      "distress_related": true
+     },
+     {
+      "rank": 3,
+      "name": "Post G",
+      "title": "Cousin's new puppy",
+      "distress_related": false
+     },
+     {
+      "rank": 4,
+      "name": "Post B",
+      "title": "Friend's soccer game photos",
+      "distress_related": false
+     },
+     {
+      "rank": 5,
+      "name": "Post H",
+      "title": "Mental health hotline awareness post",
+      "distress_related": false
+     },
+     {
+      "rank": 6,
+      "name": "Post F",
+      "title": "Outrage clip about a celebrity",
+      "distress_related": false
+     },
+     {
+      "rank": 7,
+      "name": "Post C",
+      "title": "Viral dance challenge",
+      "distress_related": false
+     },
+     {
+      "rank": 8,
+      "name": "Post E",
+      "title": "Study tips for finals",
+      "distress_related": false
+     }
+    ]
+   }
+  }
+ }
+}
