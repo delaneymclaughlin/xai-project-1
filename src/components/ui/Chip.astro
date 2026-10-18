@@ -1,0 +1,59 @@
+---
+/**
+ * Chip: filters and selections (design.md 8.0). A <button aria-pressed>.
+ * Toggle state client-side with setPressed(btn, on) from src/scripts/lib/controls.ts.
+ * Extra attributes (data-*, id, aria-controls) pass through.
+ */
+import type { HTMLAttributes } from "astro/types";
+interface Props extends HTMLAttributes<"button"> {
+  pressed?: boolean;
+}
+const { pressed = false, class: cls, ...rest } = Astro.props;
+---
+<button type="button" class:list={["chip", cls]} aria-pressed={pressed ? "true" : "false"} {...rest}><svg class="chip-check" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2 5 8.6l4.5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg><span class="chip-label"><slot /></span></button>
+<style>
+  .chip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 36px;
+    padding: 0 0.875rem;
+    border-radius: 9999px;
+    border: 1px solid var(--color-rule);
+    background: transparent;
+    color: var(--color-ink-2);
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .chip::after {
+    content: "";
+    position: absolute;
+    inset: -4px 0;
+  }
+  .chip:hover {
+    border-color: var(--color-ink-3);
+  }
+  .chip:hover .chip-label {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .chip-check {
+    display: none;
+  }
+  .chip[aria-pressed="true"] {
+    color: var(--color-ink);
+    background: var(--color-surface);
+    border-color: var(--color-ink);
+  }
+  .chip[aria-pressed="true"] .chip-check {
+    display: block;
+  }
+  .chip[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: default;
+  }
+</style>

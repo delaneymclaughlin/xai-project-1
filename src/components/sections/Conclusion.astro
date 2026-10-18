@@ -1,0 +1,10 @@
+---
+/** Conclusion (#conclusion). design.md 6.9. No script. */
+import Section from "../Section.astro";
+import SectionHeading from "../SectionHeading.astro";
+import { conclusion } from "../../lib/content";
+---
+<Section id={conclusion.id}>
+  <SectionHeading section={conclusion.id}>{conclusion.heading}</SectionHeading>
+  <p class="col-text font-sans text-small text-ink-3">TODO (conclusion): lead sentence, display line.</p>
+</Section>

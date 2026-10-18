@@ -1,0 +1,13 @@
+---
+/** Claims ledger table. design.md 8.7. Script: src/scripts/ledger.ts. */
+import { ledger, claimAnchor } from "../../../lib/content";
+---
+<div class="col-wide" data-ledger>
+  <p class="font-sans text-small text-ink-3">TODO (ledger): {ledger.length} claims.</p>
+  <ul class="font-sans text-small">
+    {ledger.map((r) => <li id={claimAnchor(r.id)}>{r.id}</li>)}
+  </ul>
+</div>
+<script>
+  import "../../../scripts/ledger.ts";
+</script>

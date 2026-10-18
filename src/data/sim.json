@@ -1,0 +1,267 @@
+{
+  "model_type": {
+    "value": "gradient-boosted model",
+    "display": "gradient-boosted model",
+    "from": "technical.intro (claim 46)",
+    "claims": [
+      46
+    ]
+  },
+  "n_impressions": {
+    "value": 20000,
+    "display": "20,000",
+    "from": "technical.intro (claim 46)",
+    "claims": [
+      46
+    ]
+  },
+  "persona_age": {
+    "value": 14,
+    "display": "14",
+    "from": "technical.intro (claim 46)",
+    "claims": [
+      46,
+      58
+    ]
+  },
+  "distress_share_all_pct": {
+    "value": 15.7,
+    "display": "15.7",
+    "from": "demo.proxy_effect.sensitive_share_overall_pct",
+    "claims": [
+      51
+    ]
+  },
+  "distress_share_top_decile_pct": {
+    "value": 47.4,
+    "display": "47.4",
+    "from": "demo.proxy_effect.sensitive_share_top_decile_pct",
+    "claims": [
+      51,
+      52
+    ]
+  },
+  "distress_share_top_decile_no_intensity_pct": {
+    "value": 38,
+    "display": "38.0",
+    "from": "technical.design_cf (claim 52)",
+    "claims": [
+      52
+    ]
+  },
+  "cf_design_removed_signal": {
+    "value": "emotional_intensity",
+    "display": "emotional intensity",
+    "from": "technical.design_cf (claim 52)",
+    "claims": [
+      52
+    ]
+  },
+  "cf_design_same_top_n": {
+    "value": 2,
+    "display": "two",
+    "from": "technical.design_cf (claim 52); demo.counterfactuals.design_side.new_feed",
+    "claims": [
+      52
+    ]
+  },
+  "cf_design_correlated_signals": {
+    "value": [
+      "watch_completion",
+      "comment_rate"
+    ],
+    "display": "watch completion and comment rate",
+    "from": "technical.design_cf (claim 52)",
+    "claims": [
+      52
+    ]
+  },
+  "lime_top_feature": {
+    "value": "topic_history",
+    "display": "the user's past engagement with the topic",
+    "from": "technical.methods[LIME].result (claim 47)",
+    "claims": [
+      47
+    ]
+  },
+  "lime_top_reason_runs": {
+    "value": 39,
+    "display": "39",
+    "from": "technical.methods[LIME].result (claim 47)",
+    "claims": [
+      47,
+      57
+    ]
+  },
+  "lime_reruns": {
+    "value": 40,
+    "display": "40",
+    "from": "technical.methods[LIME].result (claim 47)",
+    "claims": [
+      47,
+      57
+    ]
+  },
+  "lime_local_fit_pct": {
+    "value": 62,
+    "display": "62",
+    "from": "technical.methods[LIME].result (claim 47)",
+    "claims": [
+      47,
+      54
+    ],
+    "note": "LIME local surrogate fit (about 62%)."
+  },
+  "lime_rank3_feature": {
+    "value": "hours_old",
+    "display": "hours since posted",
+    "from": "technical.methods[LIME].result (claim 47)",
+    "claims": [
+      47
+    ]
+  },
+  "shap_top_feature": {
+    "value": "emotional_intensity",
+    "display": "the emotional intensity of the post",
+    "from": "demo.completeness.shap_top_reason",
+    "claims": [
+      48,
+      56,
+      65
+    ]
+  },
+  "shap_second_feature": {
+    "value": "topic_history",
+    "display": "the user's past engagement with the topic",
+    "from": "technical.methods[SHAP].result (claim 48)",
+    "claims": [
+      48
+    ]
+  },
+  "shap_top_reason_share_pct": {
+    "value": 37.5,
+    "display": "37.5",
+    "from": "demo.completeness.shap_top_reason_share_pct",
+    "claims": [],
+    "note": "Not quoted in the copy; available to the told-vs-actual interactive."
+  },
+  "shap_truth_rank_corr": {
+    "value": 0.964,
+    "display": "0.964",
+    "from": "technical.methods[SHAP].result (claim 48)",
+    "claims": [
+      48
+    ]
+  },
+  "shap_units": {
+    "value": "probability",
+    "display": "probability units",
+    "from": "technical.tests[Human usefulness] (claim 58)",
+    "claims": [
+      58
+    ],
+    "note": "Fact-check U18: TreeSHAP on a classifier defaults to log-odds. The regenerated simulation must report the unit it actually uses."
+  },
+  "cf_top_k": {
+    "value": 3,
+    "display": "three",
+    "from": "technical.methods[Counterfactuals].result (claim 50)",
+    "claims": [
+      50
+    ]
+  },
+  "cf_rank_no_history": {
+    "value": 2,
+    "display": "2",
+    "from": "technical.methods[Counterfactuals].result (claim 50)",
+    "claims": [
+      50
+    ]
+  },
+  "cf_intensity_from": {
+    "value": 0.86,
+    "display": "0.86",
+    "from": "demo.feed[Post A].features.emotional_intensity",
+    "claims": [
+      50
+    ]
+  },
+  "cf_intensity_to": {
+    "value": 0.05,
+    "display": "0.05",
+    "from": "technical.methods[Counterfactuals].result (claim 50)",
+    "claims": [
+      50
+    ]
+  },
+  "faith_k": {
+    "value": 2,
+    "display": "two",
+    "from": "technical.tests[Faithfulness] (claim 55)",
+    "claims": [
+      55
+    ]
+  },
+  "faith_drop_topk": {
+    "value": 0.354,
+    "display": "0.354",
+    "from": "technical.tests[Faithfulness] (claim 55)",
+    "claims": [
+      55
+    ]
+  },
+  "faith_drop_random": {
+    "value": 0.066,
+    "display": "0.066",
+    "from": "technical.tests[Faithfulness] (claim 55)",
+    "claims": [
+      55
+    ]
+  },
+  "shap_top3_share_pct": {
+    "value": 84.4,
+    "display": "84.4",
+    "from": "demo.completeness.three_reason_share_pct",
+    "claims": [
+      56
+    ]
+  },
+  "platform_reason": {
+    "value": "This video is similar to content you've interacted with",
+    "display": "This video is similar to content you've interacted with",
+    "from": "demo.completeness.platform_style_reason",
+    "claims": [
+      56,
+      65
+    ]
+  },
+  "platform_reason_share_pct": {
+    "value": 35.1,
+    "display": "35.1",
+    "from": "demo.completeness.platform_style_reason_share_pct",
+    "claims": [
+      56,
+      65
+    ]
+  },
+  "platform_reason_left_out_pct": {
+    "value": 64.9,
+    "display": "64.9",
+    "from": "demo.completeness.left_out_of_platform_reason_pct",
+    "claims": [
+      56
+    ]
+  },
+  "top_post": {
+    "value": "Post A",
+    "display": "Post A",
+    "from": "demo.top_post",
+    "claims": []
+  },
+  "top_post_title": {
+    "value": "Sad-edit video about feeling alone",
+    "display": "Sad-edit video about feeling alone",
+    "from": "demo.feed[0].title",
+    "claims": []
+  }
+}

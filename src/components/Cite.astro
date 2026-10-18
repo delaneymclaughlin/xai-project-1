@@ -1,0 +1,30 @@
+---
+/**
+ * Inline citation markers for a span's `s` array (design.md 8.6).
+ * No JS: each number is a link to the source list (#src-S29).
+ * With JS (src/scripts/cite.ts): opens the shared #cite-pop popover with the
+ * source title, link and the claim's fact-check status.
+ * Adds the Simulated marker automatically when `s` includes S28, unless
+ * `simMarker={false}` (instruments show it once per caption instead).
+ *
+ * Place it directly after the text with NO whitespace in between:
+ *   <span>{text.t}</span><Cite s={text.s} claims={text.claims} />
+ */
+import { getSource, sourceAnchor, sourceNumber, SIM_SOURCE } from "../lib/content";
+import Simulated from "./Simulated.astro";
+
+interface Props {
+  s: string[];
+  claims?: number[];
+  simMarker?: boolean;
+}
+const { s, claims = [], simMarker = true } = Astro.props;
+const ids = s;
+const markers = ids.map((id) => ({ id, n: sourceNumber(id), title: getSource(id).title, href: `#${sourceAnchor(id)}` }));
+const showSim = simMarker && s.includes(SIM_SOURCE);
+const claimAttr = claims.length ? claims.join(" ") : undefined;
+---
+{markers.length > 0 && <sup class="cite-group">{markers.map((m, i) => <>{i > 0 && <span class="cite-sep" aria-hidden="true">,</span>}<a class="cite" href={m.href} data-cite={m.id} data-claims={claimAttr} aria-label={`Source ${m.n}: ${m.title}`}>{m.n}</a></>)}</sup>}{showSim && <> <Simulated claims={claims} /></>}
+<script>
+  import "../scripts/cite.ts";
+</script>

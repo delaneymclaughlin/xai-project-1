@@ -1,0 +1,18 @@
+---
+/** Technical lens (#act-model): the centerpiece. design.md 6.7. */
+import Section from "../Section.astro";
+import LensHeading from "../LensHeading.astro";
+import Takeaway from "../Takeaway.astro";
+import Para from "../Para.astro";
+import FeedInstrument from "./model/FeedInstrument.astro";
+import Scorecard from "./model/Scorecard.astro";
+import { model } from "../../lib/content";
+---
+<Section id={model.id}>
+  <LensHeading lens={model} />
+  <Para para={model.intro} class="col-text text-lead measure-lead" />
+  <p class="col-text font-sans text-small text-ink-3">TODO (model): methods strip, proxy, designCf, testsIntro.</p>
+  <FeedInstrument />
+  <Scorecard />
+  <Takeaway para={model.takeaway} />
+</Section>

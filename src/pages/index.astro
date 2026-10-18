@@ -1,11 +1,35 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+import ContentNote from "../components/ContentNote.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import ColdOpen from "../components/sections/ColdOpen.astro";
+import Dawn from "../components/sections/Dawn.astro";
+import Thesis from "../components/sections/Thesis.astro";
+import LensRail from "../components/sections/LensRail.astro";
+import Ethics from "../components/sections/Ethics.astro";
+import Law from "../components/sections/Law.astro";
+import Model from "../components/sections/Model.astro";
+import Public from "../components/sections/Public.astro";
+import Conclusion from "../components/sections/Conclusion.astro";
+import Limitations from "../components/sections/Limitations.astro";
+import Sources from "../components/sections/Sources.astro";
 ---
-
 <Layout>
-	<Welcome />
+  <ContentNote />
+  <main>
+    <ColdOpen />
+    <Dawn />
+    <Thesis />
+    <div class="relative" data-lenses>
+      <LensRail />
+      <Ethics />
+      <Law />
+      <Model />
+      <Public />
+    </div>
+    <Conclusion />
+    <Limitations />
+    <Sources />
+  </main>
+  <SiteFooter />
 </Layout>

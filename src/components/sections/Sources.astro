@@ -1,0 +1,15 @@
+---
+/** Sources and claims (#sources). design.md 6.11. Ledger + numbered source list. */
+import Section from "../Section.astro";
+import SectionHeading from "../SectionHeading.astro";
+import Ledger from "./sources/Ledger.astro";
+import { sourcesSection, sourceList, sourceAnchor } from "../../lib/content";
+---
+<Section id={sourcesSection.id} spacing="block">
+  <SectionHeading section={sourcesSection.id} size="h3">{sourcesSection.heading}</SectionHeading>
+  <p class="col-text font-sans text-small text-ink-3">TODO (sources): intro note.</p>
+  <Ledger />
+  <ol class="col-wide font-sans text-small">
+    {sourceList.map((s) => <li id={sourceAnchor(s.id)}>{s.n}. {s.title}</li>)}
+  </ol>
+</Section>

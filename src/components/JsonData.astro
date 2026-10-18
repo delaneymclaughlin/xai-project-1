@@ -1,0 +1,14 @@
+---
+/**
+ * Emits build-time data for an instrument's script:
+ *   <JsonData id="sim-feed-data" data={...} />
+ * Read it client-side with readJson<T>("sim-feed-data") from src/scripts/lib/dom.ts.
+ */
+interface Props {
+  id: string;
+  data: unknown;
+}
+const { id, data } = Astro.props;
+const json = JSON.stringify(data).replace(/</g, "\\u003c");
+---
+<script type="application/json" id={id} set:html={json} />

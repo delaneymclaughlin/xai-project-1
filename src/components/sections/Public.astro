@@ -1,0 +1,14 @@
+---
+/** Public lens (#act-public). design.md 6.8. */
+import Section from "../Section.astro";
+import LensHeading from "../LensHeading.astro";
+import Takeaway from "../Takeaway.astro";
+import ToldVsActual from "./public/ToldVsActual.astro";
+import { publicLens } from "../../lib/content";
+---
+<Section id={publicLens.id}>
+  <LensHeading lens={publicLens} />
+  <p class="col-text font-sans text-small text-ink-3">TODO (public): intro, three features, stakes.</p>
+  <ToldVsActual />
+  <Takeaway para={publicLens.takeaway} />
+</Section>

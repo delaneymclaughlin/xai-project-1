@@ -1,23 +1,40 @@
+---
+import { Font } from "astro:assets";
+import "../styles/global.css";
+import { meta, citeData, SECTION_IDS } from "../lib/content";
+import JsonData from "../components/JsonData.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = meta.title, description = meta.description } = Astro.props;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+---
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content={meta.author} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#172036" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <Font cssVariable="--font-literata" preload={[{ weight: 400, style: "normal" }]} />
+    <Font cssVariable="--font-atkinson" />
+  </head>
+  <body>
+    <a class="skip-link" href={`#${SECTION_IDS.thesis}`}>Skip to the argument</a>
+    <slot />
+    <div id="cite-pop" popover="auto" role="dialog" aria-label="Source" tabindex="-1"></div>
+    <JsonData id="cite-data" data={citeData()} />
+  </body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

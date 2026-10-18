@@ -1,0 +1,17 @@
+---
+/**
+ * Heading block for the four lenses (design.md 4: the h2 is the lens question).
+ * The site.json `heading` follows as a short italic line. The lens name and
+ * the kicker ("Act 1 · Ethics") are NOT shown here: the lens name lives only in
+ * the rail and the table of contents, and lenses are not numbered.
+ */
+import { headingId, type Lens } from "../lib/content";
+interface Props {
+  lens: Pick<Lens, "id" | "question" | "heading">;
+}
+const { lens } = Astro.props;
+---
+<div class="col-text">
+  <h2 id={headingId(lens.id)} class="text-h2 font-serif measure">{lens.question}</h2>
+  <p class="mt-3 text-lead italic text-ink-2 measure-lead">{lens.heading}</p>
+</div>

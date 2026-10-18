@@ -1,0 +1,10 @@
+---
+/** Thesis (#thesis, day) plus the table of contents of the four lens questions. design.md 6.4. */
+import Section from "../Section.astro";
+import SectionHeading from "../SectionHeading.astro";
+import { thesis } from "../../lib/content";
+---
+<Section id={thesis.id}>
+  <SectionHeading section={thesis.id}>{thesis.heading}</SectionHeading>
+  <p class="col-text font-sans text-small text-ink-3">TODO (thesis): display sentence, lead sentences, lens TOC.</p>
+</Section>

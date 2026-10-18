@@ -1,0 +1,14 @@
+---
+/** Policy lens (#act-law). design.md 6.6. */
+import Section from "../Section.astro";
+import LensHeading from "../LensHeading.astro";
+import Takeaway from "../Takeaway.astro";
+import PolicySpectrum from "./law/PolicySpectrum.astro";
+import { law } from "../../lib/content";
+---
+<Section id={law.id}>
+  <LensHeading lens={law} />
+  <p class="col-text font-sans text-small text-ink-3">TODO (law): intro, health, audit, memos.</p>
+  <PolicySpectrum />
+  <Takeaway para={law.takeaway} />
+</Section>

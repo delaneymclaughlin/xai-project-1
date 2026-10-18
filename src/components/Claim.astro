@@ -1,0 +1,15 @@
+---
+/**
+ * One verified span of copy plus its citation markers. Renders `t` verbatim.
+ * Adds data-claim-id (space-separated ledger ids) for the ledger to link back.
+ */
+import type { Text } from "../lib/content";
+import Cite from "./Cite.astro";
+interface Props {
+  text: Text;
+  simMarker?: boolean;
+  class?: string;
+}
+const { text, simMarker = true, class: cls } = Astro.props;
+---
+<span class={cls} data-claim-id={text.claims.length ? text.claims.join(" ") : undefined}>{text.t}</span><Cite s={text.s} claims={text.claims} simMarker={simMarker} />

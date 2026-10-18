@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { meta } from "../lib/content";
+---
+<Layout title={`Page not found | ${meta.title}`}>
+  <main class="container-page py-section">
+    <h1 class="text-h2 font-serif">This page doesn't exist.</h1>
+    <p class="mt-4 text-body"><a href="/">Go to {meta.title}</a></p>
+  </main>
+</Layout>

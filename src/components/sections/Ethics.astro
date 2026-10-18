@@ -1,0 +1,14 @@
+---
+/** Philosophical lens (#act-ethics). design.md 6.5. No script. */
+import Section from "../Section.astro";
+import LensHeading from "../LensHeading.astro";
+import Takeaway from "../Takeaway.astro";
+import Para from "../Para.astro";
+import { ethics } from "../../lib/content";
+---
+<Section id={ethics.id}>
+  <LensHeading lens={ethics} />
+  <Para para={ethics.intro} class="col-text text-lead measure-lead" />
+  <p class="col-text font-sans text-small text-ink-3">TODO (ethics): four principle rows.</p>
+  <Takeaway para={ethics.takeaway} />
+</Section>

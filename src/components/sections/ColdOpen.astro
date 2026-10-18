@@ -1,0 +1,12 @@
+---
+/** Cold open (#cold-open, night). design.md 6.1. Script: src/scripts/cold-open.ts (the 16,300-point field). */
+import Section from "../Section.astro";
+import { coldOpen, meta, headingId } from "../../lib/content";
+---
+<Section id={coldOpen.id} ground="night">
+  <h1 id={headingId(coldOpen.id)} class="col-text text-h3 font-serif">{meta.title}</h1>
+  <p class="col-text font-sans text-small text-moon-2">TODO (cold open): hook paragraphs, the field canvas, stats[0..1], after-paragraphs, title block.</p>
+</Section>
+<script>
+  import "../../scripts/cold-open.ts";
+</script>

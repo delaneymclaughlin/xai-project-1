@@ -1,0 +1,14 @@
+---
+/**
+ * Night-to-day transition spacer (#dawn) between the cold open and the thesis.
+ * design.md 6.2. Carries only stats[3] (2x risk) with its label and citation.
+ * CSS-only (animation-timeline: view()); no script.
+ */
+import { coldOpen } from "../../lib/content";
+const stat = coldOpen.stats[3];
+---
+<div id="dawn" class="bg-night text-moon [color-scheme:dark]" data-ground="night">
+  <div class="container-page page-grid py-section">
+    <p class="col-text font-sans text-small text-moon-2">TODO (dawn): transition with "{stat.n} {stat.l}".</p>
+  </div>
+</div>

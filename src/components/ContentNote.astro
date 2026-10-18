@@ -1,0 +1,12 @@
+---
+/** Content note and support lines: first content on the page (design.md 6.1). */
+import { contentNote } from "../lib/content";
+---
+<header class="bg-night text-moon [color-scheme:dark]" data-ground="night">
+  <div class="container-page pt-8">
+    <div class="rounded-panel bg-night-2 px-5 py-4 font-sans text-small text-moon max-w-[66ch]">
+      <p>{contentNote.text}</p>
+      <p class="mt-1 text-moon-2">{contentNote.support.join(" ")}</p>
+    </div>
+  </div>
+</header>

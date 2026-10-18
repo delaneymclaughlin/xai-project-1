@@ -1,0 +1,14 @@
+---
+/**
+ * Lens rail (desktop, sticky in the rail column) plus the tablet/mobile top
+ * progress line and lens-name bar. design.md 6.3. Script: src/scripts/lens-rail.ts.
+ * index.astro renders this as the first child of a `relative` wrapper around
+ * the four lens sections, so an absolutely positioned full-height container
+ * here can hold a sticky list that spans exactly the lenses.
+ */
+import { lenses } from "../../lib/content";
+---
+<nav aria-label="Lenses" class="hidden" data-lens-rail data-count={lenses.length}></nav>
+<script>
+  import "../../scripts/lens-rail.ts";
+</script>

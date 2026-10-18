@@ -1,0 +1,67 @@
+---
+/**
+ * Toggle: counterfactual switches (design.md 8.0).
+ * <button role="switch" aria-checked> with a 40x24 track, a visible label
+ * stating the action, and an "Off"/"On" state line.
+ * Flip state client-side with setSwitch(btn, on) from src/scripts/lib/controls.ts.
+ */
+import type { HTMLAttributes } from "astro/types";
+interface Props extends HTMLAttributes<"button"> {
+  label: string;
+  checked?: boolean;
+}
+const { label, checked = false, class: cls, ...rest } = Astro.props;
+---
+<button type="button" role="switch" aria-checked={checked ? "true" : "false"} class:list={["toggle", cls]} {...rest}><span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span><span class="toggle-label">{label}</span><span class="toggle-state" aria-hidden="true" data-toggle-state>{checked ? "On" : "Off"}</span></button>
+<style>
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 44px;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+  }
+  .toggle-track {
+    flex: none;
+    position: relative;
+    width: 40px;
+    height: 24px;
+    border-radius: 9999px;
+    background: var(--color-rule);
+    transition: background-color var(--dur-quick) var(--ease-out);
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: var(--color-surface);
+    transition: transform var(--dur-quick) var(--ease-out);
+  }
+  .toggle[aria-checked="true"] .toggle-track {
+    background: var(--color-ink);
+  }
+  .toggle[aria-checked="true"] .toggle-thumb {
+    transform: translateX(16px);
+  }
+  .toggle:hover .toggle-label {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .toggle-state {
+    color: var(--color-ink-3);
+    font-size: var(--text-small);
+    font-weight: 400;
+  }
+</style>

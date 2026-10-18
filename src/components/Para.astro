@@ -1,0 +1,16 @@
+---
+/**
+ * A Para (array of spans) rendered inline, joined by a single space, each span
+ * through Claim (text + citations). `as` picks the wrapper element.
+ */
+import type { Para } from "../lib/content";
+import Claim from "./Claim.astro";
+interface Props {
+  para: Para;
+  as?: "p" | "span" | "div" | "li" | "dd" | "figcaption";
+  class?: string;
+  simMarker?: boolean;
+}
+const { para, as: Tag = "p", class: cls, simMarker = true } = Astro.props;
+---
+<Tag class={cls}>{para.map((text, i) => <>{i > 0 && " "}<Claim text={text} simMarker={simMarker} /></>)}</Tag>

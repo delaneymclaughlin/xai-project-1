@@ -1,0 +1,12 @@
+---
+/** Simulated feed with attribution bars. design.md 8.2. Script: src/scripts/sim-feed.ts. Contains RemoveSignal. */
+import RemoveSignal from "./RemoveSignal.astro";
+import { feed } from "../../../lib/content";
+---
+<div class="col-wide rounded-panel bg-day-2 p-6" data-sim-feed>
+  <p class="font-sans text-small text-ink-3">TODO (feed): {feed.length} posts, attribution pane.</p>
+  <RemoveSignal />
+</div>
+<script>
+  import "../../../scripts/sim-feed.ts";
+</script>
