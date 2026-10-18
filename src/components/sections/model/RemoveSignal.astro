@@ -1,7 +1,151 @@
 ---
-/** Remove-a-signal toggle and proxy meter, rendered inside the feed panel. design.md 8.3. Behavior lives in src/scripts/sim-feed.ts. */
-import { designCounterfactual } from "../../../lib/content";
+/**
+ * Remove-a-signal toggle and proxy meter, rendered inside the feed panel.
+ * design.md 8.3. Behavior lives in src/scripts/sim-feed.ts.
+ * All sentences and meter values are built here from data; the script only
+ * swaps among them.
+ */
+import Toggle from "../../ui/Toggle.astro";
+import Para from "../../Para.astro";
+import Simulated from "../../Simulated.astro";
+import JsonData from "../../JsonData.astro";
+import { designCounterfactual, userCounterfactual, proxyEffect, feed, model, pct } from "../../../lib/content";
+
+interface Props {
+  /** Per-post attributions for the retrained model, if the simulation emits them. */
+  cfPosts: Record<string, unknown> | null;
+}
+const { cfPosts } = Astro.props;
+
+const overall = proxyEffect.sensitive_share_overall_pct;
+const before = proxyEffect.sensitive_share_top_decile_pct;
+const after = designCounterfactual.topDecileSharePct;
+const clamp = (n: number) => Math.max(0, Math.min(100, n));
+
+const share =
+  after < before
+    ? `Top 10% share falls from ${pct(before)} to ${pct(after)}.`
+    : after > before
+      ? `Top 10% share rises from ${pct(before)} to ${pct(after)}.`
+      : `Top 10% share stays at ${pct(before)}.`;
+
+const known = new Set(feed.map((p) => p.name));
+function orderOf(newFeed: { name: string; rank: number }[]) {
+  const sorted = [...newFeed].sort((a, b) => a.rank - b.rank);
+  for (const p of sorted) if (!known.has(p.name)) throw new Error(`RemoveSignal: unknown post ${p.name} in counterfactual feed`);
+  return {
+    order: sorted.map((p) => p.name),
+    ranks: Object.fromEntries(sorted.map((p, i) => [p.name, i + 1])),
+  };
+}
+const topSame = (names: string[], n: number) => feed.slice(0, n).every((p, i) => p.name === names[i]);
+const topSentence = (same: boolean) => (same ? "Her top two posts don't change." : "Her top two posts change.");
+
+const design = orderOf(designCounterfactual.newFeed);
+const cfs: Record<string, unknown>[] = [
+  {
+    id: "design",
+    ...design,
+    sentence: `${share} ${topSentence(designCounterfactual.topUnchanged(2))}`,
+    meter: { pct: clamp(after), text: pct(after) },
+    posts: cfPosts,
+  },
+];
+if (userCounterfactual) {
+  const user = orderOf(userCounterfactual.new_feed);
+  cfs.push({
+    id: "user",
+    ...user,
+    sentence: topSentence(topSame(user.order, 2)),
+    meter: null,
+    posts: null,
+  });
+}
+
+const data = {
+  off: { sentence: "Original model.", meter: { pct: clamp(before), text: pct(before) } },
+  cfs,
+};
+const meterClaims = [...new Set([...model.proxy.body.flatMap((t) => t.claims), ...model.designCf.body.flatMap((t) => t.claims)])];
 ---
-<div data-remove-signal>
-  <p class="font-sans text-small text-ink-3">TODO (remove a signal): retrain without {designCounterfactual.removedSignal}.</p>
+<div class="remove mt-8 grid gap-8 border-t border-rule pt-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-10" data-remove-signal>
+  <div>
+    <div role="group" aria-label="Counterfactuals" class="flex flex-col gap-1">
+      <Toggle label={`Retrain without ${designCounterfactual.removedSignal}`} data-cf="design" />
+      {userCounterfactual && <Toggle label="Set her past engagement with this topic to zero" data-cf="user" />}
+    </div>
+
+    <p class="result mt-4 font-serif text-body text-ink" aria-live="polite" data-cf-result>Original model.</p>
+
+    <div class="meter mt-6">
+      <p id="sim-meter-label" class="text-small text-ink">Share of distress-related posts in the top 10% of rankings</p>
+      <div class="meter-track mt-3" aria-hidden="true">
+        <span class="meter-fill" data-meter-fill style={`width:${clamp(before)}%`}></span>
+        <span class="meter-tick" style={`left:${clamp(overall)}%`}></span>
+      </div>
+      <dl class="mt-3 flex flex-wrap gap-x-8 gap-y-1 text-small text-ink-2 nums" aria-labelledby="sim-meter-label">
+        <div class="flex items-baseline gap-2">
+          <dt class="flex items-center gap-2"><span class="sw-fill" aria-hidden="true"></span>Top 10%</dt>
+          <dd class="font-semibold text-ink" data-meter-top>{pct(before)}</dd>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <dt class="flex items-center gap-2"><span class="sw-tick" aria-hidden="true"></span>Overall share of posts</dt>
+          <dd class="font-semibold text-ink">{pct(overall)}</dd>
+        </div>
+      </dl>
+      <p class="mt-3 text-small text-ink-2"><Simulated claims={meterClaims} /> Precomputed from the simulation; nothing is recomputed in your browser.</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-8 lg:border-l lg:border-rule lg:pl-8">
+    <section aria-labelledby="sim-proxy-h">
+      <h3 id="sim-proxy-h" class="font-serif text-h3 text-ink">{model.proxy.heading}</h3>
+      <p class="mt-3 font-serif text-h2 text-ink nums" style="font-variant-numeric: lining-nums tabular-nums;">{model.proxy.stat.n}</p>
+      <p class="text-small text-ink-2">{model.proxy.stat.l}</p>
+      <Para para={model.proxy.body} class="mt-3 font-serif text-body text-ink-2" />
+    </section>
+    <section aria-labelledby="sim-dcf-h">
+      <h3 id="sim-dcf-h" class="font-serif text-h3 text-ink">{model.designCf.heading}</h3>
+      <Para para={model.designCf.body} class="mt-3 font-serif text-body text-ink-2" />
+    </section>
+  </div>
+
+  <JsonData id="sim-cf-data" data={data} />
 </div>
+
+<style>
+  .meter-track {
+    position: relative;
+    height: 20px;
+    background: var(--color-surface);
+    outline: 1px solid var(--color-rule);
+    border-radius: var(--radius-bar);
+  }
+  .meter-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--color-ink);
+    transition: width var(--dur-reorder) var(--ease-out);
+  }
+  .meter-tick {
+    position: absolute;
+    top: -6px;
+    bottom: -6px;
+    width: 4px;
+    margin-left: -2px;
+    background: var(--color-ink-3);
+    border-inline: 1px solid var(--color-surface);
+  }
+  .sw-fill {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--color-ink);
+  }
+  .sw-tick {
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: var(--color-ink-3);
+  }
+</style>

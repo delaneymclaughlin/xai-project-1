@@ -2,13 +2,91 @@
 /**
  * Night-to-day transition spacer (#dawn) between the cold open and the thesis.
  * design.md 6.2. Carries only stats[3] (2x risk) with its label and citation.
- * CSS-only (animation-timeline: view()); no script.
+ * CSS-only: a fixed ground layer plus two stacked copies of the line (moon / ink)
+ * are driven by one named view timeline on #dawn. No script.
+ * Fallback (no animation-timeline support, or reduced motion): static night
+ * ground through #dawn, static day from #thesis, plain edge between.
  */
+import Claim from "../Claim.astro";
 import { coldOpen } from "../../lib/content";
 const stat = coldOpen.stats[3];
+const text = { t: stat.l, s: stat.s, claims: stat.claims };
 ---
 <div id="dawn" class="bg-night text-moon [color-scheme:dark]" data-ground="night">
-  <div class="container-page page-grid py-section">
-    <p class="col-text font-sans text-small text-moon-2">TODO (dawn): transition with "{stat.n} {stat.l}".</p>
+  <div class="dawn-bg" aria-hidden="true"></div>
+  <div class="container-page page-grid min-h-screen items-center py-block">
+    <div class="col-wide dawn-stack">
+      <div class="dawn-line dawn-moon">
+        <p class="m-0 text-moon">
+          <span class="block font-serif text-display font-[350] [font-variant-numeric:lining-nums]">{stat.n}</span>
+          <span class="block max-w-[34ch] font-serif text-h2 text-moon"><Claim text={text} /></span>
+        </p>
+      </div>
+      <div class="dawn-line dawn-ink text-ink [color-scheme:light]" data-ground="day">
+        <p class="m-0 text-ink">
+          <span class="block font-serif text-display font-[350] [font-variant-numeric:lining-nums]">{stat.n}</span>
+          <span class="block max-w-[34ch] font-serif text-h2 text-ink"><Claim text={text} /></span>
+        </p>
+      </div>
+    </div>
   </div>
 </div>
+
+<style>
+  .dawn-stack { display: grid; }
+  .dawn-line { grid-area: 1 / 1; }
+  /* Static fallback: no fixed layer, no second copy. */
+  .dawn-bg, .dawn-ink { display: none; }
+
+  @supports (animation-timeline: view()) and (timeline-scope: --dawn) {
+    @media (prefers-reduced-motion: no-preference) {
+      :global(body) { timeline-scope: --dawn; }
+      #dawn { view-timeline: --dawn block; background-color: transparent; }
+      :global(#cold-open), :global(#thesis) { background-color: transparent; }
+
+      .dawn-bg, .dawn-ink { display: block; }
+      .dawn-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background-color: var(--color-night);
+      }
+      /* Longhands on purpose, with the name in its own rule: the CSS minifier
+         would otherwise fold them into an \`animation\` shorthand carrying the
+         timeline, which Chromium rejects as invalid. */
+      .dawn-bg { animation-name: dawn-ground; }
+      .dawn-bg, .dawn-moon, .dawn-ink {
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: --dawn;
+        animation-range: entry 55% exit 60%;
+      }
+      .dawn-moon { animation-name: dawn-moon; }
+      .dawn-ink { animation-name: dawn-ink; }
+
+      /* The ink copy sits on the day ground: restore day colours for the
+         shared citation markers (the global night rules match any ancestor). */
+      .dawn-ink :global(.cite-group),
+      .dawn-ink :global(.sim-marker) { color: var(--color-ink-2); }
+      .dawn-ink :global(.sim-marker) { text-decoration-color: var(--color-ink-3); }
+      .dawn-ink :global(:focus-visible) { outline-color: var(--color-focus); }
+    }
+  }
+
+  @keyframes dawn-ground {
+    from { background-color: var(--color-night); }
+    to { background-color: var(--color-day); }
+  }
+  /* The swap happens fast, around 42% of the ground change, where moon and ink
+     both clear 3:1 against the blended ground (the line is large text). Only
+     one copy is ever visible to assistive tech and pointers. */
+  @keyframes dawn-moon {
+    0%, 38% { opacity: 1; visibility: visible; }
+    46%, 100% { opacity: 0; visibility: hidden; }
+  }
+  @keyframes dawn-ink {
+    0%, 38% { opacity: 0; visibility: hidden; }
+    46%, 100% { opacity: 1; visibility: visible; }
+  }
+</style>

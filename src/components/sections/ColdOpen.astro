@@ -1,11 +1,72 @@
 ---
-/** Cold open (#cold-open, night). design.md 6.1. Script: src/scripts/cold-open.ts (the 16,300-point field). */
+/** Cold open (#cold-open, night). design.md 6.1. Script: src/scripts/cold-open.ts (the point field). */
 import Section from "../Section.astro";
-import { coldOpen, meta, headingId } from "../../lib/content";
+import Para from "../Para.astro";
+import Cite from "../Cite.astro";
+import Claim from "../Claim.astro";
+import JsonData from "../JsonData.astro";
+import { coldOpen, meta, headingId, parseCount } from "../../lib/content";
+
+const [hook, numbers, mechanism, ...rest] = coldOpen.paragraphs;
+// The inquest-numbers sentence leads into the field; the remaining spans of that
+// paragraph (the Pinterest emails) follow it.
+const beforeField = numbers.slice(0, 1);
+const afterField = [numbers.slice(1), mechanism, ...rest, ...coldOpen.after].filter((p) => p && p.length);
+
+const [total, lit, fine] = [coldOpen.stats[0], coldOpen.stats[1], coldOpen.stats[2]];
+const totalN = parseCount(total.n);
+const litN = parseCount(lit.n);
+const fmt = (n: number) => n.toLocaleString("en-US");
+const fieldLabel = `A field of ${fmt(totalN)} small points, one for each post Molly saved, liked or shared in her last six months. ${fmt(litN)} of them are brighter: the posts related to depression, self-harm or suicide.`;
+const fineText = fine ? { t: `${fine.n} ${fine.l}. ${fine.fine ?? ""}`.trim(), s: fine.s, claims: fine.claims } : null;
 ---
-<Section id={coldOpen.id} ground="night">
-  <h1 id={headingId(coldOpen.id)} class="col-text text-h3 font-serif">{meta.title}</h1>
-  <p class="col-text font-sans text-small text-moon-2">TODO (cold open): hook paragraphs, the field canvas, stats[0..1], after-paragraphs, title block.</p>
+<Section id={coldOpen.id} ground="night" innerClass="gap-y-12 md:gap-y-16">
+  <Para para={hook} as="p" class="col-wide font-serif text-display font-[350] tracking-[-0.01em] text-moon max-w-[30ch]" />
+
+  <div class="col-text measure-lead text-lead text-moon">
+    <Para para={beforeField} as="p" />
+  </div>
+
+  <figure class="col-wide m-0">
+    <div class="w-full overflow-hidden" data-field-wrap>
+      <canvas
+        id="molly-field"
+        class="block max-w-full"
+        style={`aspect-ratio: 3 / 1; width: 100%;`}
+        role="img"
+        aria-label={fieldLabel}
+      ></canvas>
+    </div>
+    <figcaption class="mt-4 max-w-[66ch] font-sans text-small text-moon-2">
+      Each point is one post. The brighter points are the {fmt(litN)} related to depression, self-harm or suicide. Their positions are illustrative: the inquest reported counts, not <span class="whitespace-nowrap">order.<Cite s={lit.s} claims={lit.claims} /></span>
+    </figcaption>
+  </figure>
+  <JsonData id="cold-open-data" data={{ total: totalN, lit: litN, label: fieldLabel }} />
+
+  <dl class="col-text m-0 grid grid-cols-[minmax(5.5rem,auto)_1fr] items-baseline gap-x-5 gap-y-6">
+    {[total, lit].map((st) => (
+      <>
+        <dt class="font-serif text-h2 text-moon [font-variant-numeric:lining-nums_tabular-nums] text-right"><span class="sr-only">Count: </span>{st.n}</dt>
+        <dd class="m-0 text-body text-moon-2"><Claim text={{ t: st.l, s: st.s, claims: st.claims }} /></dd>
+      </>
+    ))}
+  </dl>
+
+  <div class="col-text measure-lead space-y-6 text-lead text-moon">
+    {afterField.map((p) => <Para para={p} as="p" />)}
+  </div>
+
+  {fineText && (
+    <p class="col-text max-w-[58ch] font-sans text-small text-moon-2">
+      <Claim text={fineText} />
+    </p>
+  )}
+
+  <div class="col-text border-t border-moon-2/30 pt-6">
+    <h1 id={headingId(coldOpen.id)} class="font-serif text-h3 text-moon">{meta.title}</h1>
+    <p class="mt-1 font-serif text-lead italic text-moon measure-lead">{meta.subtitle}</p>
+    <p class="mt-3 font-sans text-small text-moon-2">{meta.author}<br />{meta.affil}</p>
+  </div>
 </Section>
 <script>
   import "../../scripts/cold-open.ts";

@@ -1,7 +1,122 @@
 ---
 /** Five-tests scorecard. design.md 8.4. Native <details>; no script. */
-import { model } from "../../../lib/content";
+import Para from "../../Para.astro";
+import Simulated from "../../Simulated.astro";
+import { model, scorecardSummary } from "../../../lib/content";
+
+const sum = scorecardSummary();
+const summary =
+  [sum.pass && `${sum.pass} pass`, sum.partial && `${sum.partial} partial`, sum.fail && `${sum.fail} fail`]
+    .filter(Boolean)
+    .join(", ") + ` across ${sum.tests} tests`;
+const simClaims = [...new Set(model.tests.flatMap((t) => t.body.flatMap((b) => (b.s.includes("S28") ? b.claims : []))))];
 ---
-<div class="col-wide" data-scorecard>
-  <p class="font-sans text-small text-ink-3">TODO (scorecard): {model.tests.length} tests.</p>
+<div class="col-wide rounded-panel bg-day-2 p-4 font-sans sm:p-6 lg:p-8" data-scorecard>
+  <p class="text-small text-ink-2 nums" data-scorecard-summary>{summary}</p>
+  <ul class="mt-3 border-t border-rule" aria-label="Evaluation tests and their scores">
+    {model.tests.map((t) => (
+      <li class="border-b border-rule">
+        <details open={t.name === "Human usefulness"}>
+          <summary class="sc-sum">
+            <span class="sc-glyphs" aria-hidden="true">
+              {t.glyphs.map((g) => (
+                <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+                  {g === "pass" && <circle cx="8" cy="8" r="7.5" fill="currentColor" />}
+                  {g === "partial" && (
+                    <>
+                      <circle cx="8" cy="8" r="6.75" fill="none" stroke="currentColor" stroke-width="1.5" />
+                      <path d="M8 1.25a6.75 6.75 0 0 0 0 13.5z" fill="currentColor" />
+                    </>
+                  )}
+                  {g === "fail" && <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="2" />}
+                </svg>
+              ))}
+            </span>
+            <span class="sc-name font-serif text-h3 text-ink">{t.name}</span>
+            <span class="sc-score text-ui text-ink-2">{t.score}</span>
+            <span class="sc-icon" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="16" height="16"><path d="M3 8h10" stroke="currentColor" stroke-width="1.5" /><path class="v" d="M8 3v10" stroke="currentColor" stroke-width="1.5" /></svg>
+            </span>
+          </summary>
+          <div class="sc-body">
+            <Para para={t.body} class="font-serif text-body text-ink measure" simMarker={false} />
+          </div>
+        </details>
+      </li>
+    ))}
+  </ul>
+  <p class="mt-4 text-small text-ink-2"><Simulated claims={simClaims} /> These verdicts are for the simulated feed, not a real platform.</p>
 </div>
+
+<style>
+  details {
+    interpolate-size: allow-keywords;
+  }
+  details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size var(--dur-quick) var(--ease-out),
+      content-visibility var(--dur-quick) allow-discrete;
+  }
+  details[open]::details-content {
+    block-size: auto;
+  }
+  .sc-sum {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      "g n x"
+      ". s x";
+    column-gap: 0.5rem;
+    row-gap: 0.125rem;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.75rem 0;
+    cursor: pointer;
+    list-style: none;
+    color: var(--color-ink);
+  }
+  .sc-sum::-webkit-details-marker {
+    display: none;
+  }
+  .sc-sum:hover .sc-name {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .sc-glyphs {
+    grid-area: g;
+    display: inline-flex;
+    gap: 0.25rem;
+    color: var(--color-ink);
+  }
+  .sc-name {
+    grid-area: n;
+  }
+  .sc-score {
+    grid-area: s;
+  }
+  .sc-icon {
+    grid-area: x;
+    display: inline-flex;
+    color: var(--color-ink-2);
+  }
+  details[open] .sc-icon .v {
+    opacity: 0;
+  }
+  .sc-body {
+    padding: 0 0 1.25rem 3.25rem;
+  }
+  @media (width >= 40rem) {
+    .sc-sum {
+      grid-template-columns: 3.25rem minmax(8rem, 1fr) minmax(0, 14rem) auto;
+      grid-template-areas: "g n s x";
+      column-gap: 0.75rem;
+    }
+  }
+  @media (width < 40rem) {
+    .sc-body {
+      padding-left: 0;
+    }
+  }
+</style>

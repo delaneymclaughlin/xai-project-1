@@ -11,8 +11,23 @@ import { model } from "../../lib/content";
 <Section id={model.id}>
   <LensHeading lens={model} />
   <Para para={model.intro} class="col-text text-lead measure-lead" />
-  <p class="col-text font-sans text-small text-ink-3">TODO (model): methods strip, proxy, designCf, testsIntro.</p>
+
+  <div class="col-wide border-t border-ink pt-8">
+    <div class="grid gap-10 md:grid-cols-3 md:gap-8 lg:gap-12">
+      {model.methods.map((m) => (
+        <section>
+          <h3 class="font-serif text-h3 text-ink">{m.name}</h3>
+          <p class="mt-1 font-sans text-small text-ink-3">{m.line}</p>
+          <Para para={m.what} class="mt-4 text-body text-ink-2" />
+          <Para para={m.result} class="mt-4 text-body text-ink" />
+        </section>
+      ))}
+    </div>
+  </div>
+
   <FeedInstrument />
+
+  <Para para={model.testsIntro} class="col-text text-lead measure-lead" />
   <Scorecard />
   <Takeaway para={model.takeaway} />
 </Section>

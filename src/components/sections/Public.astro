@@ -3,12 +3,39 @@
 import Section from "../Section.astro";
 import LensHeading from "../LensHeading.astro";
 import Takeaway from "../Takeaway.astro";
+import Para from "../Para.astro";
 import ToldVsActual from "./public/ToldVsActual.astro";
 import { publicLens } from "../../lib/content";
 ---
 <Section id={publicLens.id}>
   <LensHeading lens={publicLens} />
-  <p class="col-text font-sans text-small text-ink-3">TODO (public): intro, three features, stakes.</p>
+  <Para para={publicLens.intro} class="col-text text-lead measure-lead" />
+
+  <div class="col-text mt-10 lg:col-wide">
+    <ol class="m-0 list-none p-0">
+      {publicLens.features.map((f, i) => (
+        <li class:list={["border-t border-rule py-8", i === publicLens.features.length - 1 && "border-b"]}>
+          <h3 class="font-serif text-h3 text-ink m-0">{f.name}</h3>
+          <div class="mt-4 grid gap-6 md:grid-cols-2 md:gap-10">
+            <div>
+              <p class="m-0 mb-2 font-sans text-small font-semibold text-ink-3">What it says</p>
+              <Para para={f.says} class="text-body text-ink-2" />
+            </div>
+            <div>
+              <p class="m-0 mb-2 font-sans text-small font-semibold text-ink-3">What it leaves out</p>
+              <Para para={f.limits} class="text-body text-ink" />
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
   <ToldVsActual />
-  <Takeaway para={publicLens.takeaway} />
+
+  <div class="col-text mt-12">
+    <h3 class="font-serif text-h3 text-ink m-0 mb-3">{publicLens.stakes.heading}</h3>
+    <Para para={publicLens.stakes.body} class="text-body text-ink-2 measure" />
+  </div>
+  <Takeaway para={publicLens.takeaway} class="mt-12" />
 </Section>

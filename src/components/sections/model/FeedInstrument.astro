@@ -1,12 +1,556 @@
 ---
-/** Simulated feed with attribution bars. design.md 8.2. Script: src/scripts/sim-feed.ts. Contains RemoveSignal. */
+/**
+ * Simulated feed with attribution bars. design.md 8.2. Script: src/scripts/sim-feed.ts.
+ * Contains RemoveSignal (8.3). Everything is server-rendered in its default
+ * state (rank 1 selected); the script only swaps among precomputed states.
+ */
 import RemoveSignal from "./RemoveSignal.astro";
-import { feed } from "../../../lib/content";
+import Simulated from "../../Simulated.astro";
+import JsonData from "../../JsonData.astro";
+import {
+  feed,
+  baseValue,
+  shapScaleMax,
+  featureSide,
+  featureKeys,
+  featureLabels,
+  designCounterfactual,
+  model,
+  SIDE_LABEL,
+  signed,
+  fixed,
+  type Attribution,
+  type FeatureKey,
+  type Side,
+} from "../../../lib/content";
+
+/* ---- Bar geometry (design.md 8.2): one shared scale for every post ---- */
+const ZERO = 40; // zero line, % of track width (leaves room for negatives)
+const POS_MAX = 45; // % of track the largest |SHAP| may extend to the right
+const maxNeg = Math.max(
+  1e-9,
+  ...feed.flatMap((p) => p.attributions.map((a) => (a.value < 0 ? -a.value : 0))),
+);
+// Largest |SHAP| anywhere maps to POS_MAX; a negative bar must also fit left of zero.
+const K = Math.min(POS_MAX / shapScaleMax, (ZERO - 3) / maxNeg);
+const r2 = (n: number) => Math.round(n * 100) / 100;
+
+interface RowState {
+  l: number;
+  w: number;
+  neg: boolean;
+  tl: number;
+  t: string;
+}
+interface PostState {
+  heading: string;
+  scoreLine: string | null;
+  baseLine: string | null;
+  rows: Record<string, RowState>;
+  order: Record<string, number>;
+  her: string;
+  design: string;
+  total: string;
+  announce: string;
+}
+
+function row(v: number): RowState {
+  const w = Math.abs(v) * K;
+  return { l: r2(v >= 0 ? ZERO : ZERO - w), w: r2(w), neg: v < 0, tl: r2(v >= 0 ? ZERO + w : ZERO), t: signed(v) };
+}
+
+const SIDES: Side[] = ["her", "design"];
+function sortAttrs(values: Record<string, number>): Attribution[] {
+  return featureKeys
+    .map((f) => ({ feature: f, label: featureLabels[f], side: featureSide[f], value: values[f] ?? 0 }))
+    .sort((a, b) => SIDES.indexOf(a.side) - SIDES.indexOf(b.side) || Math.abs(b.value) - Math.abs(a.value));
+}
+
+function stateFor(opts: {
+  title: string;
+  rank: number;
+  attrs: Attribution[];
+  score: number | null;
+  retrained: boolean;
+}): PostState {
+  const { title, rank, attrs, score, retrained } = opts;
+  const rows: Record<string, RowState> = {};
+  const order: Record<string, number> = {};
+  const seen: Record<Side, number> = { her: 0, design: 0 };
+  const totals: Record<Side, number> = { her: 0, design: 0 };
+  for (const a of attrs) {
+    rows[a.feature] = row(a.value);
+    order[a.feature] = seen[a.side]++;
+    totals[a.side] += a.value;
+  }
+  const biggest = attrs.reduce((m, a) => (Math.abs(a.value) > Math.abs(m.value) ? a : m), attrs[0]);
+  return {
+    heading: retrained ? `Why ${title} ranks #${rank} in the retrained model` : `Why ${title} ranked #${rank}`,
+    scoreLine: score === null ? null : `Score ${fixed(score)}`,
+    baseLine: score === null ? null : `starts from the average prediction, ${fixed(baseValue)}`,
+    rows,
+    order,
+    her: signed(totals.her),
+    design: signed(totals.design),
+    total: signed(totals.her + totals.design),
+    announce: `Post ranked ${rank}, ${title}. Largest factor: ${biggest.label}, ${biggest.value >= 0 ? "plus" : "minus"} ${Math.abs(biggest.value).toFixed(2)}.`,
+  };
+}
+
+const posts: Record<string, PostState> = {};
+for (const p of feed) {
+  if (Math.abs(p.totalChange - (p.score - baseValue)) > 0.0015)
+    console.warn(`[FeedInstrument] ${p.name}: sum of SHAP ${p.totalChange} != score - base ${p.score - baseValue}`);
+  posts[p.name] = stateFor({ title: p.title, rank: p.rank, attrs: p.attributions, score: p.score, retrained: false });
+}
+const origRanks = Object.fromEntries(feed.map((p) => [p.name, p.rank]));
+
+/** Retrained-model attributions, only if the simulation emits them. */
+const cfPosts: Record<string, PostState> | null = designCounterfactual.perPost
+  ? Object.fromEntries(
+      designCounterfactual.newFeed.map((p) => [
+        p.name,
+        stateFor({
+          title: p.title,
+          rank: p.rank,
+          attrs: sortAttrs(designCounterfactual.perPost![p.name] as Record<string, number>),
+          score: null,
+          retrained: true,
+        }),
+      ]),
+    )
+  : null;
+
+/* ---- Default render (rank 1) ---- */
+const first = feed[0];
+const firstState = posts[first.name];
+const groups = SIDES.map((side) => ({
+  side,
+  label: SIDE_LABEL[side],
+  rows: first.attributions.filter((a) => a.side === side),
+}));
+
+/* ---- Hidden instrument summary, built from data ---- */
+const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight"];
+const lead = feed.findIndex((p) => !p.distress_related);
+const nTop = lead === -1 ? feed.length : lead;
+const summary =
+  `Simulated feed of ${feed.length} posts.` +
+  (nTop === 0 ? "" : nTop === 1 ? " The top post is distress-related." : ` The top ${WORDS[nTop] ?? nTop} are distress-related.`) +
+  " Select a post to see why it ranked where it did.";
+
+/* ---- Table fallback columns: her signals first ---- */
+const tableFeatures: FeatureKey[] = [...featureKeys].sort(
+  (a, b) => SIDES.indexOf(featureSide[a]) - SIDES.indexOf(featureSide[b]),
+);
+
+const simClaims = [...new Set([...model.intro.flatMap((t) => t.claims), ...model.methods[1].result.flatMap((t) => t.claims)])];
+const scorePct = (s: number) => Math.max(0, Math.min(100, s * 100));
 ---
-<div class="col-wide rounded-panel bg-day-2 p-6" data-sim-feed>
-  <p class="font-sans text-small text-ink-3">TODO (feed): {feed.length} posts, attribution pane.</p>
-  <RemoveSignal />
+<div class="col-wide rounded-panel bg-day-2 p-4 font-sans sm:p-6 lg:p-8 my-2 lg:my-6" data-sim-feed>
+  <p class="sr-only">{summary}</p>
+
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-10">
+    <!-- Left pane: the feed -->
+    <div>
+      <h3 id="sim-feed-heading" class="font-serif text-h3 text-ink">Her feed</h3>
+      <div
+        role="listbox"
+        aria-labelledby="sim-feed-heading"
+        aria-orientation="vertical"
+        class="feed-list mt-4"
+        data-feed-list
+      >
+        {feed.map((p, i) => (
+          <div
+            role="option"
+            class="opt"
+            id={`sim-opt-${i}`}
+            data-name={p.name}
+            data-orig-rank={p.rank}
+            aria-selected={i === 0 ? "true" : "false"}
+            aria-describedby={`sim-opt-name-${i}`}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            <span class="opt-rank nums" data-rank>{p.rank}</span>
+            <span class="opt-body">
+              <span class="opt-title">{p.title}</span>
+              <span class="opt-meta">
+                {p.distress_related && (
+                  <span class="tag">
+                    <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /></svg>
+                    Distress-related
+                  </span>
+                )}
+                <span class="was" data-was hidden></span>
+              </span>
+              <span class="opt-score" data-score>
+                <span class="score-track" aria-hidden="true"><span class="score-fill" style={`width:${scorePct(p.score).toFixed(1)}%`}></span></span>
+                <span class="nums score-num">{fixed(p.score)}</span>
+              </span>
+            </span>
+            <span class="sr-only" id={`sim-opt-name-${i}`}>{p.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Right pane: attribution for the selected post -->
+    <div class="pane" data-attr-pane>
+      <h3 class="font-serif text-h3 text-ink" data-heading>{firstState.heading}</h3>
+      <p class="mt-1 text-small text-ink-2 nums" data-scoreline-wrap>
+        <span data-scoreline>{firstState.scoreLine}</span><span data-base-sep> · </span><span data-baseline>{firstState.baseLine}</span>
+      </p>
+      <p class="dim-note mt-3 text-small text-ink" data-dim-note hidden>
+        Attributions shown are for the original model. The retrained model's values aren't part of this demo.
+      </p>
+
+      <div class="attr-body mt-5" data-attr-body>
+        {groups.map((g) => (
+          <section class="group" aria-labelledby={`sim-group-${g.side}`}>
+            <h4 id={`sim-group-${g.side}`} class:list={["group-label", g.side]}>{g.label}</h4>
+            <ul class="rows">
+              {g.rows.map((a) => {
+                const r = firstState.rows[a.feature];
+                return (
+                  <li class="row" data-feature={a.feature} data-side={a.side} style={`order:${firstState.order[a.feature]}`}>
+                    <span class="row-label">{a.label}</span>
+                    <span class="track" aria-hidden="true">
+                      <span class="zero" style={`left:${ZERO}%`}></span>
+                      <span class="bar" data-bar data-neg={r.neg ? "" : undefined} style={`left:${r.l}%;width:${r.w}%`}></span>
+                    </span>
+                    <span class="val nums" data-val style={`left:calc(${r.tl}% + 6px)`}>{r.t}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+
+        <dl class="readout nums">
+          <div><dt class="her">Her signals</dt><dd class="her" data-her>{firstState.her}</dd></div>
+          <div><dt class="design">Post and ranker signals</dt><dd class="design" data-design>{firstState.design}</dd></div>
+          <div class="total"><dt>Total change from average</dt><dd data-total>{firstState.total}</dd></div>
+        </dl>
+        <p class="mt-3 text-small text-ink-2">SHAP values are in units of predicted engagement probability.</p>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-6 text-small text-ink-2"><Simulated claims={simClaims} /> A model trained on simulated impressions, not a real platform.</p>
+  <p class="sr-only" aria-live="polite" data-feed-live></p>
+
+  <details class="values mt-5">
+    <summary class="text-small text-ink">Show these values as a table</summary>
+    <div class="mt-3">
+      <table class="vt" role="table">
+        <caption class="text-small text-ink-2 pb-2 text-left">SHAP value of each signal for each post, in the original model, in order of rank. Positive values push the post up.</caption>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th role="columnheader" scope="col">Post</th>
+            <th role="columnheader" scope="col">Score</th>
+            {tableFeatures.map((f) => <th role="columnheader" scope="col">{featureLabels[f]}</th>)}
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          {feed.map((p) => (
+            <tr role="row">
+              <th role="rowheader" scope="row" data-label="Post">{p.rank}. {p.title}</th>
+              <td role="cell" class="nums" data-label="Score">{fixed(p.score)}</td>
+              {tableFeatures.map((f) => (
+                <td role="cell" class="nums" data-label={featureLabels[f]}>{signed(p.attributions.find((a) => a.feature === f)?.value ?? 0)}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <RemoveSignal cfPosts={cfPosts} />
+
+  <JsonData id="sim-feed-data" data={{ posts, origRanks, defaultName: first.name }} />
 </div>
+
+<style>
+  .feed-list {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--color-rule);
+  }
+  .opt {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+    column-gap: 0.5rem;
+    padding: 0.75rem 0.75rem 0.75rem 0.625rem;
+    border-bottom: 1px solid var(--color-rule);
+    border-left: 2px solid transparent;
+    cursor: pointer;
+    background: transparent;
+  }
+  .opt:hover .opt-title {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .opt[aria-selected="true"] {
+    background: var(--color-surface);
+    border-left-color: var(--color-ink);
+  }
+  .opt[data-changed] {
+    outline: 1px solid var(--color-ink);
+    outline-offset: -1px;
+  }
+  .opt-rank {
+    font-size: var(--text-small);
+    line-height: 1.5rem;
+    color: var(--color-ink-3);
+  }
+  .opt-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+  .opt-title {
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+  .opt-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 0.75rem;
+    font-size: var(--text-small);
+    color: var(--color-ink-2);
+  }
+  .opt-meta:empty,
+  .opt-meta:not(:has(.tag)):has(.was[hidden]) {
+    display: none;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+  .was {
+    color: var(--color-ink-3);
+  }
+  .opt-score {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .opt-score[hidden] {
+    display: none;
+  }
+  .score-track {
+    position: relative;
+    flex: 1;
+    height: 4px;
+  }
+  .score-fill {
+    display: block;
+    height: 100%;
+    background: var(--color-ink);
+    opacity: 0.7;
+    border-radius: var(--radius-bar);
+  }
+  .score-num {
+    font-size: var(--text-small);
+    color: var(--color-ink-2);
+    min-width: 2.75rem;
+    text-align: right;
+  }
+
+  /* Attribution pane */
+  .attr-body {
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+  .pane[data-dim] .attr-body {
+    opacity: 0.45;
+  }
+  .dim-note {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--color-ink);
+  }
+  .group + .group {
+    margin-top: 1.25rem;
+  }
+  .group-label {
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
+    font-weight: 600;
+    margin-bottom: 0.625rem;
+  }
+  .her {
+    color: var(--color-her);
+  }
+  .design {
+    color: var(--color-design);
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .row {
+    position: relative;
+  }
+  .row-label {
+    display: block;
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
+    color: var(--color-ink);
+    margin-bottom: 2px;
+  }
+  .track {
+    position: relative;
+    display: block;
+    height: 14px;
+  }
+  .zero {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
+    background: var(--color-ink-3);
+  }
+  .bar {
+    position: absolute;
+    top: 0;
+    height: 14px;
+    border-radius: var(--radius-bar);
+    box-sizing: border-box;
+    transition:
+      left var(--dur-base) var(--ease-out),
+      width var(--dur-base) var(--ease-out);
+  }
+  .row[data-side="her"] .bar {
+    background: var(--color-her);
+  }
+  .row[data-side="design"] .bar {
+    background: var(--color-design);
+  }
+  .bar[data-neg] {
+    background: var(--color-neg) !important;
+    border-left: 2px solid var(--side, var(--color-ink-3));
+  }
+  .row[data-side="her"] .bar[data-neg] {
+    --side: var(--color-her);
+  }
+  .row[data-side="design"] .bar[data-neg] {
+    --side: var(--color-design);
+  }
+  .val {
+    position: absolute;
+    bottom: 0;
+    font-size: var(--text-small);
+    line-height: 14px;
+    color: var(--color-ink);
+    white-space: nowrap;
+    transition: left var(--dur-base) var(--ease-out);
+  }
+  .readout {
+    margin-top: 1.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-rule);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: var(--text-small);
+  }
+  .readout > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  .readout .total {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+  .readout dd {
+    margin: 0;
+  }
+
+  /* Values table */
+  .values summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+  .vt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
+  }
+  .vt th,
+  .vt td {
+    padding: 0.5rem 0.5rem;
+    text-align: right;
+    vertical-align: bottom;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .vt th[scope="row"],
+  .vt th:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+  .vt thead th {
+    font-weight: 500;
+    color: var(--color-ink-2);
+  }
+  @media (width < 40rem) {
+    .vt thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    .vt,
+    .vt tbody,
+    .vt tr,
+    .vt th,
+    .vt td,
+    .vt caption {
+      display: block;
+    }
+    .vt tr {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--color-rule);
+    }
+    .vt th,
+    .vt td {
+      border: 0;
+      padding: 0.125rem 0;
+    }
+    .vt td {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      text-align: right;
+    }
+    .vt td::before {
+      content: attr(data-label);
+      text-align: left;
+      color: var(--color-ink-2);
+    }
+    .vt th[scope="row"] {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+  }
+</style>
+
 <script>
   import "../../../scripts/sim-feed.ts";
 </script>

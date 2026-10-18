@@ -2,14 +2,70 @@
 /** Sources and claims (#sources). design.md 6.11. Ledger + numbered source list. */
 import Section from "../Section.astro";
 import SectionHeading from "../SectionHeading.astro";
+import Para from "../Para.astro";
 import Ledger from "./sources/Ledger.astro";
-import { sourcesSection, sourceList, sourceAnchor } from "../../lib/content";
+import {
+  sourcesSection,
+  sourceList,
+  sourceAnchor,
+  claimAnchor,
+  sourceDomain,
+  ledger,
+  SIM_SOURCE,
+  SIM_SENTENCE,
+  SECTION_IDS,
+} from "../../lib/content";
+
+// Which claims cite each source (back-links into the ledger).
+const claimsBySource = new Map<string, number[]>();
+for (const r of ledger) for (const s of r.sources) claimsBySource.set(s, [...(claimsBySource.get(s) ?? []), r.id]);
 ---
 <Section id={sourcesSection.id} spacing="block">
   <SectionHeading section={sourcesSection.id} size="h3">{sourcesSection.heading}</SectionHeading>
-  <p class="col-text font-sans text-small text-ink-3">TODO (sources): intro note.</p>
+  <Para para={sourcesSection.intro} class="col-text font-sans text-small text-ink-2 measure" />
   <Ledger />
-  <ol class="col-wide font-sans text-small">
-    {sourceList.map((s) => <li id={sourceAnchor(s.id)}>{s.n}. {s.title}</li>)}
-  </ol>
+  <div class="col-wide">
+    <h3 id="source-list-heading" class="font-serif text-h3 font-medium">Sources</h3>
+    <ol class="source-list font-sans text-small" aria-labelledby="source-list-heading">
+      {sourceList.map((s) => {
+        const cited = claimsBySource.get(s.id) ?? [];
+        const domain = sourceDomain(s.url);
+        return (
+          <li id={sourceAnchor(s.id)} value={s.n}>
+            <span class="source-title">{s.title}</span>
+            {s.url ? (
+              <a class="source-url break-anywhere" href={s.url} target="_blank" rel="noopener">{domain ? <span class="source-domain">{domain}</span> : null}{s.url}</a>
+            ) : s.id === SIM_SOURCE ? (
+              <span class="source-url">{SIM_SENTENCE.replace(/; see Limitations\.$/, ".")} <a href={`#${SECTION_IDS.limitations}`}>See Limitations</a>.</span>
+            ) : null}
+            {cited.length > 0 && (
+              <span class="source-cited">
+                Cited in claim{cited.length > 1 ? "s" : ""}{" "}
+                {cited.map((id, i) => <>{i > 0 && ", "}<a class="nums" href={`#${claimAnchor(id)}`}>{id}</a></>)}
+              </span>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </div>
 </Section>
+
+<style>
+  .source-list { margin: 1rem 0 0; padding: 0; list-style: none; display: grid; gap: 0.25rem; }
+  .source-list li {
+    display: grid; gap: 0.125rem; padding: 0.75rem 0.5rem 0.75rem 3rem; margin-inline: -0.5rem;
+    border-top: 1px solid var(--color-rule); position: relative; min-width: 0;
+  }
+  .source-list li::before {
+    content: attr(value) ".";
+    position: absolute; left: 0.5rem; top: 0.75rem; width: 2.25rem;
+    color: var(--color-ink-3); font-variant-numeric: tabular-nums lining-nums;
+  }
+  .source-title { color: var(--color-ink); font-weight: 600; }
+  .source-url { color: var(--color-ink-2); }
+  .source-domain { display: block; color: var(--color-ink-3); }
+  .source-cited { color: var(--color-ink-3); }
+  .source-cited a { display: inline-block; min-width: 1.5rem; text-align: center; }
+  .source-list li:target { background: var(--color-day-2); }
+</style>

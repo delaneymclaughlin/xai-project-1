@@ -1,10 +1,31 @@
 ---
-/** Conclusion (#conclusion). design.md 6.9. No script. */
+/** Conclusion (#conclusion). design.md 6.9. No script, no animation. */
 import Section from "../Section.astro";
 import SectionHeading from "../SectionHeading.astro";
-import { conclusion } from "../../lib/content";
+import Claim from "../Claim.astro";
+import { conclusion, splitSentences } from "../../lib/content";
+import type { Text } from "../../lib/content";
+
+// Flatten every span in order; the last sentence of the last span becomes the display line.
+const spans: Text[][] = conclusion.paragraphs.map((p) => p.map((t) => ({ ...t })));
+const lastPara = spans[spans.length - 1];
+const lastSpan = lastPara[lastPara.length - 1];
+const sentences = splitSentences(lastSpan.t);
+const displayText = sentences[sentences.length - 1];
+const head = sentences.slice(0, -1).join(" ");
+const display: Text = { ...lastSpan, t: displayText };
+if (head) lastSpan.t = head;
+else lastPara.pop();
+const leadParas = spans.filter((p) => p.length > 0);
 ---
-<Section id={conclusion.id}>
-  <SectionHeading section={conclusion.id}>{conclusion.heading}</SectionHeading>
-  <p class="col-text font-sans text-small text-ink-3">TODO (conclusion): lead sentence, display line.</p>
+<Section id={conclusion.id} spacing="none" class="pt-[calc(var(--spacing-section)*1.5)] pb-section">
+  <SectionHeading section={conclusion.id} class="sr-only">{conclusion.heading}</SectionHeading>
+  <div class="col-text flex flex-col gap-6">
+    {leadParas.map((p) => (
+      <p class="font-serif text-lead text-ink-2">
+        {p.map((t, i) => <>{i > 0 && " "}<Claim text={t} /></>)}
+      </p>
+    ))}
+  </div>
+  <p class="col-text font-serif text-display text-ink max-w-[24ch] text-balance"><Claim text={display} /></p>
 </Section>

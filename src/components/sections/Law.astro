@@ -1,14 +1,57 @@
 ---
-/** Policy lens (#act-law). design.md 6.6. */
+/** Policy lens (#act-law). design.md 6.6. Spectrum script lives in PolicySpectrum. */
 import Section from "../Section.astro";
 import LensHeading from "../LensHeading.astro";
 import Takeaway from "../Takeaway.astro";
+import Para from "../Para.astro";
 import PolicySpectrum from "./law/PolicySpectrum.astro";
 import { law } from "../../lib/content";
+
+const SHORT: Record<string, string> = {
+  au: "Australia",
+  bans: "Other age bans",
+  ny: "New York",
+  ca: "California",
+  uk: "UK Online Safety Act",
+  dsa: "EU DSA transparency",
+  "dsa-risk": "EU DSA audits",
+  "dsa-minors": "EU DSA minors",
+  aiact: "EU AI Act",
+  kosa: "US KOSA",
+  kgm: "KGM v. Meta",
+  nm: "New Mexico",
+};
+const shortOf = (id: string) => SHORT[id] ?? law.measures.find((m) => m.id === id)?.juris ?? id;
 ---
 <Section id={law.id}>
   <LensHeading lens={law} />
-  <p class="col-text font-sans text-small text-ink-3">TODO (law): intro, health, audit, memos.</p>
+  <Para para={law.intro} class="col-text text-lead measure-lead" />
+
   <PolicySpectrum />
+
+  <div class="col-text">
+    <h3 class="text-h3 font-serif measure">{law.health.heading}</h3>
+    <Para para={law.health.body} class="mt-4 text-body measure" />
+  </div>
+  <div class="col-text">
+    <h3 class="text-h3 font-serif measure">{law.audit.heading}</h3>
+    <Para para={law.audit.body} class="mt-4 text-body measure" />
+  </div>
+
+  <div class="col-wide">
+    <h3 class="text-lead italic text-ink-2 font-serif">{law.memos.heading}</h3>
+    <div class="mt-6 grid gap-x-12 gap-y-10 md:grid-cols-2">
+      {law.memos.items.map((memo) => (
+        <article class="border-t-2 border-ink pt-4">
+          <h4 class="text-h3 font-serif">{memo.title}</h4>
+          <Para para={memo.body} class="mt-3 text-body measure" />
+          {memo.relates.length > 0 && (
+            <p class="mt-3 font-sans text-small text-ink-3">Relates to: {memo.relates.map((id) => shortOf(id)).join(", ")}</p>
+          )}
+        </article>
+      ))}
+    </div>
+  </div>
+
   <Takeaway para={law.takeaway} />
 </Section>

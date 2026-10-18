@@ -228,13 +228,14 @@
   white-space: nowrap;
 }
 [data-ground="night"] .cite-group { color: var(--color-moon-2); }
-.cite-group .cite-sep { margin-right: 0.15em; }
+.cite-group .cite-sep { margin-right: 0.1em; }
+/* Tight visually (no padded-out gaps around single digits); the hit area is
+   widened with padding and pulled back with negative margin. */
 .cite {
   display: inline-block;
-  min-width: 24px;
   min-height: 24px;
-  padding: 6px 3px;
-  margin: -6px -1px;
+  padding: 6px 5px;
+  margin: -6px -4px;
   text-align: center;
   color: inherit;
   text-decoration: none;

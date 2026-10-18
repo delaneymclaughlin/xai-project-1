@@ -1,10 +1,258 @@
 ---
 /** Policy spectrum and filter instrument. design.md 8.1. Script: src/scripts/policy-spectrum.ts. */
-import { law } from "../../../lib/content";
+import { law, measuresByBand, MEASURE_BANDS, type Measure } from "../../../lib/content";
+import Para from "../../Para.astro";
+import Chip from "../../ui/Chip.astro";
+import Toggle from "../../ui/Toggle.astro";
+import JsonData from "../../JsonData.astro";
+
+/** Display labels for marks (not claims). Falls back to the jurisdiction. */
+const SHORT: Record<string, string> = {
+  au: "Australia",
+  bans: "Other age bans",
+  ny: "New York",
+  ca: "California",
+  uk: "UK Online Safety Act",
+  dsa: "EU DSA transparency",
+  "dsa-risk": "EU DSA audits",
+  "dsa-minors": "EU DSA minors",
+  aiact: "EU AI Act",
+  kosa: "US KOSA",
+  kgm: "KGM v. Meta",
+  nm: "New Mexico",
+};
+const shortOf = (m: Measure) => SHORT[m.id] ?? m.juris;
+const BAND_NOTE: Record<string, string> = {
+  Access: "Decides who sees the feed",
+  Liability: "Assigns responsibility after harm",
+  Transparency: "Discloses or explains",
+  Design: "Changes how the feed is built",
+};
+const LEVEL: Record<string, string> = { none: "None", indirect: "Indirect", implicit: "Implicit", global: "Global", local: "Local" };
+const STATE_WORD: Record<string, string> = {
+  in_effect: "in effect or decided",
+  pending: "pending, proposed or under challenge",
+};
+
+const bands = measuresByBand();
+const total = law.measures.length;
+const defaultId = bands.find((b) => b.band === "Access")?.measures[0]?.id ?? law.measures[0].id;
+const data = {
+  total,
+  defaultId,
+  measures: law.measures.map((m) => ({ id: m.id, type: m.type, requiresExplanation: m.requiresExplanation, label: shortOf(m) })),
+};
 ---
-<div class="col-wide rounded-panel bg-day-2 p-6" data-policy-spectrum>
-  <p class="font-sans text-small text-ink-3">TODO (policy spectrum): {law.measures.length} measures.</p>
+<div class="col-wide spectrum" data-policy-spectrum>
+  <script is:inline>document.currentScript.parentElement.setAttribute("data-js", "");</script>
+  <h3 class="sr-only">Policy spectrum</h3>
+  <p class="sr-only">Policy spectrum of {total} measures in four bands, from access limits to feed design. Select a measure to open its profile.</p>
+
+  <p class="font-serif text-lead text-ink" id="spectrum-q">How close does the measure get to the ranking system?</p>
+
+  <div class="frame mt-5">
+    <span class="end end-a font-sans text-small text-ink-2">Doesn't touch it</span>
+    <span class="end end-b font-sans text-small text-ink-2">Changes it</span>
+    <div class="bands" role="listbox" aria-orientation="horizontal" aria-labelledby="spectrum-q" data-listbox>
+      {bands.map(({ band, measures }) => (
+        <div class="band" role="group" aria-label={`${band}: ${BAND_NOTE[band]}`}>
+          <div class="band-head">
+            <p class="font-sans text-ui font-semibold text-ink">{band}</p>
+            <p class="font-sans text-small text-ink-2">{BAND_NOTE[band]}</p>
+          </div>
+          <div class="marks">
+            {measures.map((m) => (
+              <div class="mark-wrap">
+                <a
+                  class="mark"
+                  id={`opt-${m.id}`}
+                  href={`#profile-${m.id}`}
+                  role="option"
+                  data-id={m.id}
+                  data-state={m.statusState}
+                  aria-selected={m.id === defaultId ? "true" : "false"}
+                  aria-label={`${m.juris}: ${m.name}. ${STATE_WORD[m.statusState]}.`}
+                  tabindex={m.id === defaultId ? 0 : -1}
+                >
+                  <span class="dot" aria-hidden="true"></span>
+                  <span class="lbl" aria-hidden="true">
+                    <span class="lbl-short">{shortOf(m)}</span>
+                    <span class="lbl-long"><span class="lbl-name">{m.name}</span><span class="lbl-juris">{m.juris}</span></span>
+                  </span>
+                  <svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                </a>
+                <div class="slot" data-slot={m.id}></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <p class="mt-4 font-sans text-small text-ink-2 measure">
+    <span class="legend-key"><span class="dot dot-sm" data-state="in_effect" aria-hidden="true"></span> In effect or decided</span>
+    <span class="legend-key"><span class="dot dot-sm" data-state="pending" aria-hidden="true"></span> Pending, proposed or under challenge</span>
+  </p>
+  <p class="mt-3 max-w-[66ch] font-sans text-small text-ink-2">
+    The bands run from measures that never touch the ranking system to those that change it, and that order is the argument. Marks are the {total} measures profiled here, not a count of all legislation, so the bands are equal in width whatever they hold.
+  </p>
+
+  <div class="mt-6 flex flex-wrap items-center gap-x-8 gap-y-3">
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by approach">
+      <Chip pressed data-filter="All">All</Chip>
+      {MEASURE_BANDS.map((b) => <Chip data-filter={b}>{b}</Chip>)}
+    </div>
+    <Toggle label="Requires an explanation" data-explain-toggle />
+  </div>
+  <p class="mt-3 font-sans text-small text-ink-2" aria-live="polite" data-count>Showing {total} of {total} measures</p>
+
+  <div class="profiles mt-6" data-profiles>
+    {law.measures.map((m) => (
+      <section
+        class="profile"
+        id={`profile-${m.id}`}
+        data-profile={m.id}
+        data-active={m.id === defaultId ? "" : undefined}
+        aria-labelledby={`opt-${m.id}`}
+      >
+        <p class="font-sans text-small text-ink-2">{m.juris}</p>
+        <h4 class="mt-1 font-serif text-h3">{m.name}</h4>
+        <p class="mt-3 font-serif text-lead text-ink">{m.headline}</p>
+        <p class="mt-4 inline-flex items-center gap-2 font-sans text-small font-medium text-ink">
+          <span class="dot dot-sm" data-state={m.statusState} aria-hidden="true"></span>
+          <span>{m.statusTag}</span>
+          <span class="font-normal text-ink-2">({STATE_WORD[m.statusState]})</span>
+        </p>
+        <dl class="facts mt-6">
+          <dt>Status</dt>
+          <dd>
+            {m.statusDisplay === "list" ? (
+              <ul class="list-disc space-y-1 pl-5">
+                {m.status.map((s) => <li><Para para={[s]} as="span" /></li>)}
+              </ul>
+            ) : (
+              <Para para={m.status} as="span" />
+            )}
+          </dd>
+          <dt>What it does</dt>
+          <dd><Para para={m.does} as="span" /></dd>
+          <dt>Explanation required</dt>
+          <dd>
+            {!m.explain.text[0]?.t.trimStart().startsWith(LEVEL[m.explain.level]) && (
+              <span class="level font-sans text-small font-semibold">{LEVEL[m.explain.level]}</span>
+            )}
+            <Para para={m.explain.text} as="span" />
+          </dd>
+          <dt class="catch-dt">What it leaves untouched</dt>
+          <dd class="catch-dd"><Para para={m.catch} as="span" class="font-serif text-lead italic text-ink" /></dd>
+        </dl>
+      </section>
+    ))}
+  </div>
+
+  <JsonData id="policy-spectrum-data" data={data} />
 </div>
+
+<style>
+  .frame { display: flex; flex-direction: column; }
+  .end-a { order: 0; padding-bottom: 0.5rem; }
+  .bands { order: 1; display: flex; flex-direction: column; }
+  .end-b { order: 2; padding-top: 0.5rem; }
+  .end { color: var(--color-ink-2); }
+  .band { border-top: 1px solid var(--color-rule); padding-block: 0.75rem; }
+  .band-head { padding-bottom: 0.25rem; }
+  .marks { display: flex; flex-direction: column; }
+  .mark-wrap { border-top: 1px solid var(--color-rule); }
+  .mark-wrap:first-child { border-top: 0; }
+
+  .mark {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 44px;
+    padding: 0.5rem 0;
+    color: var(--color-ink);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-size: var(--text-ui);
+    line-height: var(--text-ui--line-height);
+  }
+  .dot {
+    flex: none;
+    box-sizing: border-box;
+    width: 28px;
+    height: 28px;
+    border-radius: 9999px;
+    border: 2px solid var(--color-ink);
+    background: var(--color-ink);
+  }
+  .dot[data-state="pending"], .mark[data-state="pending"] .dot { background: transparent; }
+  .dot-sm { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-right: 0.25rem; }
+  .legend-key { display: inline-block; margin-right: 1.25rem; }
+  .lbl { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .lbl-short { display: none; }
+  .lbl-name { display: block; font-weight: 500; }
+  .lbl-juris { display: block; font-size: var(--text-small); color: var(--color-ink-2); }
+  .chev { flex: none; color: var(--color-ink-2); transition: transform var(--dur-quick) var(--ease-out); }
+  .mark[aria-expanded="true"] .chev { transform: rotate(180deg); }
+  .mark[aria-expanded="true"] .lbl-name { text-decoration: underline 2px; text-underline-offset: 0.2em; }
+  .mark[aria-disabled="true"] { opacity: 0.4; cursor: default; }
+  .mark:hover .lbl-name, .mark:hover .lbl-short { text-decoration: underline; text-underline-offset: 0.2em; }
+
+  .slot:empty { display: none; }
+  .slot { padding-bottom: 0.75rem; }
+
+  .profile {
+    background: var(--color-surface);
+    border-radius: var(--radius-panel);
+    padding: 1.25rem 1rem;
+  }
+  .profile + .profile { margin-top: 1.5rem; }
+  .slot .profile { margin: 0; }
+  [data-js] .profile:not([data-active]) { display: none; }
+  [data-js] .profiles:empty { display: none; }
+  .facts { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 0.25rem; }
+  .facts dt {
+    margin-top: 1rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-small);
+    line-height: var(--text-small--line-height);
+    font-weight: 600;
+    color: var(--color-ink-2);
+  }
+  .facts dt:first-child { margin-top: 0; }
+  .facts dd { font-size: var(--text-body); line-height: var(--text-body--line-height); max-width: 66ch; }
+  .level { margin-right: 0.5rem; color: var(--color-ink); }
+  .catch-dt { padding-top: 1rem; border-top: 1px solid var(--color-rule); }
+  .catch-dd { max-width: 58ch; }
+
+  @media (width >= 40rem) {
+    .profile { padding: 2rem; }
+    .facts { grid-template-columns: 12rem minmax(0, 1fr); column-gap: 2rem; row-gap: 1.25rem; }
+    .facts dt, .facts dt:first-child { margin-top: 0.3rem; }
+    .facts dt.catch-dt { padding-top: 1.45rem; border-top: 1px solid var(--color-rule); }
+    .catch-dd { padding-top: 1.25rem; border-top: 1px solid var(--color-rule); }
+
+    .frame { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .end-a { grid-column: 1; grid-row: 1; order: 0; padding: 0 0 0.5rem; }
+    .end-b { grid-column: 4; grid-row: 1; order: 0; text-align: right; padding: 0 0 0.5rem; }
+    .bands { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--color-ink-3); }
+    .band { border-top: 0; padding: 0.75rem 0.75rem 0.5rem; }
+    .band + .band { border-left: 1px solid var(--color-rule); }
+    .band:first-child { padding-left: 0; }
+    .band-head { min-height: 4.25rem; }
+    .marks { flex-direction: row; flex-wrap: wrap; gap: 0.25rem 0.25rem; }
+    .mark-wrap { border: 0; width: 5.25rem; }
+    .mark { flex-direction: column; align-items: center; justify-content: flex-start; gap: 0.375rem; padding: 0.5rem 0.125rem; text-align: center; min-height: 44px; }
+    .lbl { flex: none; width: 100%; }
+    .lbl-short { display: block; font-size: var(--text-small); line-height: var(--text-small--line-height); }
+    .lbl-long, .chev { display: none; }
+    .mark[aria-selected="true"] .lbl-short { font-weight: 700; text-decoration: underline 2px; text-underline-offset: 0.2em; }
+    .slot { display: none; }
+  }
+</style>
 <script>
   import "../../../scripts/policy-spectrum.ts";
 </script>
