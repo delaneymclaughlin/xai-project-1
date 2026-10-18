@@ -1,0 +1,284 @@
+{
+  "feature_labels": {
+    "topic_history": "User's past engagement with this topic",
+    "emotional_intensity": "Emotional intensity of the post",
+    "reactions": "Reactions (popularity)",
+    "comment_rate": "Comment rate",
+    "watch_completion": "Avg. watch completion",
+    "from_followed": "From an account the user follows",
+    "hours_old": "Hours since posted"
+  },
+  "proxy_effect": {
+    "sensitive_share_overall_pct": 15.7,
+    "sensitive_share_top_decile_pct": 47.4
+  },
+  "feed": [
+    {
+      "rank": 1,
+      "name": "Post A",
+      "title": "Sad-edit video about feeling alone",
+      "distress_related": true,
+      "score": 0.964,
+      "features": {
+        "topic_history": 0.88,
+        "emotional_intensity": 0.86,
+        "reactions": 0.55,
+        "comment_rate": 0.48,
+        "watch_completion": 0.8,
+        "from_followed": 0,
+        "hours_old": 10
+      }
+    },
+    {
+      "rank": 2,
+      "name": "Post D",
+      "title": "Late-night venting post about feeling empty",
+      "distress_related": true,
+      "score": 0.932,
+      "features": {
+        "topic_history": 0.82,
+        "emotional_intensity": 0.92,
+        "reactions": 0.4,
+        "comment_rate": 0.62,
+        "watch_completion": 0.72,
+        "from_followed": 0,
+        "hours_old": 20
+      }
+    },
+    {
+      "rank": 3,
+      "name": "Post H",
+      "title": "Mental health hotline awareness post",
+      "distress_related": false,
+      "score": 0.592,
+      "features": {
+        "topic_history": 0.7,
+        "emotional_intensity": 0.4,
+        "reactions": 0.3,
+        "comment_rate": 0.2,
+        "watch_completion": 0.4,
+        "from_followed": 0,
+        "hours_old": 30
+      }
+    },
+    {
+      "rank": 4,
+      "name": "Post G",
+      "title": "Cousin's new puppy",
+      "distress_related": false,
+      "score": 0.583,
+      "features": {
+        "topic_history": 0.4,
+        "emotional_intensity": 0.3,
+        "reactions": 0.2,
+        "comment_rate": 0.25,
+        "watch_completion": 0.5,
+        "from_followed": 1,
+        "hours_old": 1
+      }
+    },
+    {
+      "rank": 5,
+      "name": "Post F",
+      "title": "Outrage clip about a celebrity",
+      "distress_related": false,
+      "score": 0.397,
+      "features": {
+        "topic_history": 0.2,
+        "emotional_intensity": 0.9,
+        "reactions": 0.8,
+        "comment_rate": 0.7,
+        "watch_completion": 0.6,
+        "from_followed": 0,
+        "hours_old": 5
+      }
+    },
+    {
+      "rank": 6,
+      "name": "Post C",
+      "title": "Viral dance challenge",
+      "distress_related": false,
+      "score": 0.348,
+      "features": {
+        "topic_history": 0.35,
+        "emotional_intensity": 0.35,
+        "reactions": 0.92,
+        "comment_rate": 0.3,
+        "watch_completion": 0.55,
+        "from_followed": 0,
+        "hours_old": 6
+      }
+    },
+    {
+      "rank": 7,
+      "name": "Post B",
+      "title": "Friend's soccer game photos",
+      "distress_related": false,
+      "score": 0.325,
+      "features": {
+        "topic_history": 0.3,
+        "emotional_intensity": 0.2,
+        "reactions": 0.25,
+        "comment_rate": 0.2,
+        "watch_completion": 0.45,
+        "from_followed": 1,
+        "hours_old": 3
+      }
+    },
+    {
+      "rank": 8,
+      "name": "Post E",
+      "title": "Study tips for finals",
+      "distress_related": false,
+      "score": 0.191,
+      "features": {
+        "topic_history": 0.25,
+        "emotional_intensity": 0.1,
+        "reactions": 0.45,
+        "comment_rate": 0.15,
+        "watch_completion": 0.4,
+        "from_followed": 0,
+        "hours_old": 2
+      }
+    }
+  ],
+  "top_post": "Post A",
+  "completeness": {
+    "shap_top_reason": "emotional_intensity",
+    "shap_top_reason_share_pct": 37.5,
+    "three_reason_share_pct": 84.4,
+    "platform_style_reason": "This video is similar to content you've interacted with",
+    "platform_style_reason_share_pct": 35.1,
+    "left_out_of_platform_reason_pct": 64.9
+  },
+  "shap": {
+    "per_post": {
+      "Post A": {
+        "topic_history": 0.20982175582371274,
+        "emotional_intensity": 0.22459899866855493,
+        "reactions": 0.02507307130334478,
+        "comment_rate": 0.01659360323512995,
+        "watch_completion": 0.07074671448888402,
+        "from_followed": -0.018693642237384945,
+        "hours_old": 0.03276752757560555
+      },
+      "Post B": {
+        "topic_history": -0.0797087297474026,
+        "emotional_intensity": -0.0992272029703004,
+        "reactions": -0.039799411997624885,
+        "comment_rate": -0.016557874817773842,
+        "watch_completion": 0.0049208979911726115,
+        "from_followed": 0.04065705158050666,
+        "hours_old": 0.11199638014345739
+      },
+      "Post C": {
+        "topic_history": -0.07631327902991701,
+        "emotional_intensity": -0.016025472338337475,
+        "reactions": -0.025283314719789424,
+        "comment_rate": -0.008652370975809483,
+        "watch_completion": 0.02106106672363891,
+        "from_followed": -0.052915184204398294,
+        "hours_old": 0.10303625298729308
+      },
+      "Post D": {
+        "topic_history": 0.2256795523953008,
+        "emotional_intensity": 0.18993548470612961,
+        "reactions": -0.008467243287672439,
+        "comment_rate": 0.036284569168647356,
+        "watch_completion": 0.07201737806443459,
+        "from_followed": -0.02224668955492185,
+        "hours_old": 0.03647845083360941
+      },
+      "Post E": {
+        "topic_history": -0.0790405249166604,
+        "emotional_intensity": -0.1540738535839861,
+        "reactions": -0.006494616722868164,
+        "comment_rate": -0.023492878128204425,
+        "watch_completion": -0.007499256356136368,
+        "from_followed": -0.023483710611236455,
+        "hours_old": 0.08274436555433981
+      },
+      "Post F": {
+        "topic_history": -0.14721505230740148,
+        "emotional_intensity": 0.30567271502224214,
+        "reactions": -0.0046797740947056524,
+        "comment_rate": -0.24476629988195847,
+        "watch_completion": 0.04595132889036715,
+        "from_followed": -0.028633651084793287,
+        "hours_old": 0.06769285867902458
+      },
+      "Post G": {
+        "topic_history": 0.03957360194784272,
+        "emotional_intensity": -0.05411866364675018,
+        "reactions": -0.0163557507726466,
+        "comment_rate": -0.007715778469079024,
+        "watch_completion": 0.004624805999641084,
+        "from_followed": 0.04522220877367739,
+        "hours_old": 0.16890592620504663
+      },
+      "Post H": {
+        "topic_history": 0.22195434496009134,
+        "emotional_intensity": 0.020603132362880267,
+        "reactions": -0.02722689159489533,
+        "comment_rate": -0.00832664347128625,
+        "watch_completion": -0.03292086965949239,
+        "from_followed": -0.02212255096551268,
+        "hours_old": 0.037090467338243116
+      }
+    }
+  },
+  "counterfactuals": {
+    "design_side": {
+      "new_feed": [
+        {
+          "rank": 1,
+          "name": "Post A",
+          "title": "Sad-edit video about feeling alone",
+          "distress_related": true
+        },
+        {
+          "rank": 2,
+          "name": "Post D",
+          "title": "Late-night venting post about feeling empty",
+          "distress_related": true
+        },
+        {
+          "rank": 3,
+          "name": "Post G",
+          "title": "Cousin's new puppy",
+          "distress_related": false
+        },
+        {
+          "rank": 4,
+          "name": "Post B",
+          "title": "Friend's soccer game photos",
+          "distress_related": false
+        },
+        {
+          "rank": 5,
+          "name": "Post H",
+          "title": "Mental health hotline awareness post",
+          "distress_related": false
+        },
+        {
+          "rank": 6,
+          "name": "Post F",
+          "title": "Outrage clip about a celebrity",
+          "distress_related": false
+        },
+        {
+          "rank": 7,
+          "name": "Post C",
+          "title": "Viral dance challenge",
+          "distress_related": false
+        },
+        {
+          "rank": 8,
+          "name": "Post E",
+          "title": "Study tips for finals",
+          "distress_related": false
+        }
+      ]
+    }
+  }
+}
