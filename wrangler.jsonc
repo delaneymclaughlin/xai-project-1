@@ -1,11 +1,14 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "xai-feed-brief",
+  "name": "algorithmic-design-features",
   "compatibility_date": "2026-10-18",
   // Assets-only Worker: no "main". Cloudflare serves the static build.
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
-  }
+  },
+  "routes": [
+    { "pattern": "xai-1.delaneymclaughlin.com", "custom_domain": true }
+  ]
 }
