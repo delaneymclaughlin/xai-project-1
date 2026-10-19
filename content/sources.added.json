@@ -6,7 +6,7 @@
       "url": "https://newshub.medianet.com.au/2026/07/early-insights-from-esafetys-comprehensive-evaluation-project/164211/"
     },
     "S72": {
-      "title": "L. M. Given, The Conversation (republished by Tech Xplore), on eSafety's three-month evaluation of Australia's social media age restrictions, July 31, 2026",
+      "title": "L. M. Given, \"More than 80% of kids still using social media despite ban, new eSafety report finds,\" The Conversation (via Tech Xplore), July 31, 2026",
       "url": "https://techxplore.com/news/2026-07-kids-social-media-esafety.html"
     },
     "S73": {
@@ -18,7 +18,7 @@
       "url": "https://learninglink.oup.com/access/beauchamp-childress9e"
     },
     "S75": {
-      "title": "M. Trimble, on the four principles of Beauchamp and Childress, Ulster Medical Journal 93(2):83–86, 2024",
+      "title": "M. Trimble, \"Ethics – A matter of principle?\", Ulster Medical Journal 93(2):83–86, 2024",
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11633310"
     },
     "S76": {
@@ -30,25 +30,37 @@
     {
       "id": "A1",
       "text": "In its final judgment (Aug. 2026), the New Mexico court ordered changes for under-18 accounts: no push notifications from 10 PM to 7 AM or during school hours (para. 168), like counts hidden by default (para. 169) and a cap of 90 hours of use a month (para. 170). It granted no relief on the design and implementation of Meta's algorithms (para. 173) and declined to order changes to infinite scroll and autoplay, which it said \"require legislative or executive branch action\" (para. 160), citing the risk of competitively damaging Meta when such features are industry-wide, and First Amendment and Section 230 concerns (paras. 160, 163–166).",
-      "sources": ["S59"],
+      "sources": [
+        "S59"
+      ],
       "where": "Site: Policy lens, New Mexico row and pull quote"
     },
     {
       "id": "A2",
       "text": "In eSafety's three-month evaluation, the share of under-16s holding an age-restricted account fell from 52.4% to 42.1%; platforms' failure to implement effective age assurance was cited as the main reason children kept accounts.",
-      "sources": ["S71", "S35", "S72"],
+      "sources": [
+        "S71",
+        "S35",
+        "S72"
+      ],
       "where": "Site: Policy lens, Australia row and age-check line"
     },
     {
       "id": "A3",
       "text": "In an Internet Matters survey of 1,270 UK children aged 9–16 (fieldwork Sept.–Oct. 2025, published May 2026), 32% said they had bypassed an age check in the past two months; the most common methods were a fake birthdate (13%) and someone else's login (9%).",
-      "sources": ["S73"],
+      "sources": [
+        "S73"
+      ],
       "where": "Site: Policy lens, age-check line"
     },
     {
       "id": "A4",
       "text": "The four principles come from Principles of Biomedical Ethics by Tom Beauchamp and James Childress, first published in 1979 and in its ninth edition (2026); Floridi and Cowls (2019) adopted the same four for AI ethics and added a fifth, explicability.",
-      "sources": ["S74", "S75", "S76"],
+      "sources": [
+        "S74",
+        "S75",
+        "S76"
+      ],
       "where": "Site: Philosophical lens intro"
     }
   ]
