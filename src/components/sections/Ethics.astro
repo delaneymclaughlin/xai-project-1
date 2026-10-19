@@ -4,21 +4,25 @@ import Cite from "../Cite.astro";
 const principles = [
   {
     name: "Autonomy",
+    meaning: "Respect people’s right to make informed choices about their own lives.",
     line: "Ranking built to predict what a user will engage with, and keep supplying it, can undermine the conditions that make voluntary choice possible.",
     s: ["S25", "S26"],
   },
   {
     name: "Beneficence",
+    meaning: "Act to benefit people, not merely avoid hurting them.",
     line: "These systems are optimized for engagement, so any benefit to the user is incidental to their actual objective.",
     s: ["S25", "S3"],
   },
   {
     name: "Nonmaleficence",
+    meaning: "Do no harm; avoid causing injury or needless risk.",
     line: "When amplification of harmful content to vulnerable users is known, the resulting harm is foreseeable and preventable.",
     s: ["S25", "S31"],
   },
   {
     name: "Justice",
+    meaning: "Share benefits, burdens and risks fairly.",
     line: "The costs fall hardest on minors, users in distress, and regions with little oversight, as Amnesty International found of Facebook’s role in Myanmar.",
     s: ["S25", "S24"],
   },
@@ -28,12 +32,13 @@ const principles = [
   <div class="wrap">
     <div class="head-row">
       <SectionHead id="ethics-h" lens={{ n: 1, name: "Philosophical" }}>Why engagement ranking is wrong</SectionHead>
-      <p class="lede measure head-aside">Four principles of biomedical ethics, applied to a ranked feed.<Cite ids={["S25"]} /></p>
+      <p class="measure head-aside">These four principles come from <cite>Principles of Biomedical Ethics</cite> by Tom Beauchamp and James Childress, first published in 1979 and now in its ninth edition (2026).<Cite ids={["S74", "S75"]} /> It is a classic of medical ethics, and AI ethicists have since adopted the same four principles, adding a fifth: explicability.<Cite ids={["S76"]} /></p>
     </div>
     <ul class="pillars">
       {principles.map((p) => (
         <li class="pillar on-navy">
           <h3 class="h-item">{p.name}</h3>
+          <p class="meaning">{p.meaning}</p>
           <p>{p.line}<Cite ids={p.s} /></p>
         </li>
       ))}
@@ -46,7 +51,7 @@ const principles = [
   @media (width >= 64rem) {
     .head-row { grid-template-columns: 7fr 5fr; gap: 4rem; align-items: end; }
   }
-  .head-aside { color: var(--color-ink-2); }
+  .head-aside { color: var(--color-ink-2); font-size: 1rem; line-height: 1.6; }
   .pillars {
     list-style: none;
     padding: 0;
@@ -59,6 +64,8 @@ const principles = [
   .pillar { background: var(--color-navy); color: var(--color-paper); padding: 1.5rem 1.4rem 1.75rem; }
   .pillar:nth-child(even) { background: var(--color-band); }
   .pillar p { margin-top: 0.9rem; font-size: 1rem; line-height: 1.6; }
+  .pillar .meaning { margin-top: 0.5rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgb(250 247 241 / 0.35); font-size: 0.875rem; line-height: 1.45; }
+  .head-aside cite { font-style: italic; }
   .pillar :global(.cite a) { color: var(--color-paper); }
   @media (width >= 64rem) { .pillars { gap: 0.75rem; } }
 </style>

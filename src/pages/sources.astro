@@ -6,7 +6,7 @@ import { sources, ledger, limitations, verdictLabel, verdictHelp, type Verdict }
 
 const counts = new Map<Verdict, number>();
 ledger.forEach((r) => r.verdict && counts.set(r.verdict, (counts.get(r.verdict) ?? 0) + 1));
-const order: Verdict[] = ["supported", "partially_supported", "outdated", "unverifiable", "pending-simulation"];
+const order: Verdict[] = ["supported", "partially_supported", "outdated", "unverifiable", "pending-simulation", "added"];
 const filters = order.filter((v) => counts.has(v));
 const num = (id: string) => id.slice(1);
 ---

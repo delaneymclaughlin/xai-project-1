@@ -59,11 +59,11 @@ const tests = [
   { name: "Fidelity", q: "Does the explanation match what the model does?", verdict: "Pass / Partial", tone: "mixed",
     a: `SHAP’s shares add up exactly to the score (pass). LIME’s stand-in reproduced about ${stats.limeFit}% (partial).` },
   { name: "Faithfulness", q: "Do the signals it names really drive the score?", verdict: "Pass", tone: "pass",
-    a: `Removing SHAP’s top two signals cut the score by ${stats.faithTop}, versus an average of ${stats.faithRandom} for two picked at random.` },
+    a: `Taking away the two signals SHAP ranked highest lowered the score about ${Math.round(Number(stats.faithTop) / Number(stats.faithRandom))} times as much as taking away two at random (${stats.faithTop} vs. an average of ${stats.faithRandom}).` },
   { name: "Stability", q: "Same answer if you ask again?", verdict: "Pass", tone: "pass",
     a: `LIME gave the same top reason in ${stats.limeRuns} of ${stats.limeReruns} reruns; SHAP’s top three held when the post was nudged.` },
   { name: "Completeness", q: "Does it cover the main reasons?", verdict: "Fail", tone: "fail",
-    a: `SHAP’s top three signals cover ${stats.top3Pct}%. A platform-style one-line reason covers only ${stats.toldPct}%.` },
+    a: `SHAP’s top three reasons explain ${stats.top3Pct}% of the score; the one reason a platform would show explains only ${stats.toldPct}%.` },
   { name: "Human usefulness", q: "Could the teen actually use it?", verdict: "Fail", tone: "fail",
     a: "Not tested with users. Judged against its audience, a SHAP number is not something a 14-year-old can act on." },
 ];

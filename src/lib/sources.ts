@@ -3,6 +3,7 @@
  * content/claims.verified.json (authoritative for source ids and wording).
  */
 import verified from "../../content/claims.verified.json";
+import added from "../../content/sources.added.json";
 
 export interface Source {
   id: string;
@@ -11,7 +12,7 @@ export interface Source {
   url: string | null;
 }
 
-const rawSources = verified.sources as Record<string, { title: string; url: string | null }>;
+const rawSources = { ...verified.sources, ...added.sources } as Record<string, { title: string; url: string | null }>;
 
 export const sources: Source[] = Object.entries(rawSources)
   .map(([id, v]) => ({ id, n: Number(id.slice(1)), title: v.title, url: v.url }))
@@ -30,7 +31,8 @@ export type Verdict =
   | "partially_supported"
   | "outdated"
   | "unverifiable"
-  | "pending-simulation";
+  | "pending-simulation"
+  | "added";
 
 export const verdictLabel: Record<Verdict, string> = {
   supported: "Supported",
@@ -38,6 +40,7 @@ export const verdictLabel: Record<Verdict, string> = {
   outdated: "Updated",
   unverifiable: "Unverifiable",
   "pending-simulation": "Simulation",
+  added: "Added later",
 };
 
 export const verdictHelp: Record<Verdict, string> = {
@@ -46,6 +49,7 @@ export const verdictHelp: Record<Verdict, string> = {
   outdated: "Was true once; updated to the status as of October 2026.",
   unverifiable: "No source could be found to back it.",
   "pending-simulation": "Result of this project's simulated feed (S28); not checked against outside sources.",
+  added: "Added after the main fact-check; checked against the cited source on October 18, 2026.",
 };
 
 interface FactRaw {
@@ -55,7 +59,7 @@ interface FactRaw {
 }
 
 export interface LedgerRow {
-  id: number;
+  id: number | string;
   text: string;
   sources: string[];
   where: string;
@@ -66,7 +70,7 @@ export interface LedgerRow {
 
 const facts = verified.factcheck as unknown as Record<string, FactRaw>;
 
-export const ledger: LedgerRow[] = verified.ledger.map((row) => {
+const base: LedgerRow[] = verified.ledger.map((row) => {
   const f = facts[String(row.id)] ?? {};
   const v = f.verdict as Verdict | undefined;
   return {
@@ -79,5 +83,18 @@ export const ledger: LedgerRow[] = verified.ledger.map((row) => {
     note: f.note ?? "",
   };
 });
+
+export const ledger: LedgerRow[] = [
+  ...base,
+  ...added.ledger.map((row) => ({
+    id: row.id,
+    text: row.text,
+    sources: row.sources,
+    where: row.where,
+    verdict: "added" as Verdict,
+    changed: false,
+    note: "",
+  })),
+];
 
 export const limitations: string[] = verified.limitations.map((l) => l.t);
