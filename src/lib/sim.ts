@@ -68,4 +68,31 @@ export const stats = {
   toldPct: demo.completeness.platform_style_reason_share_pct.toFixed(1),
   untoldPct: demo.completeness.left_out_of_platform_reason_pct.toFixed(1),
   platformReason: demo.completeness.platform_style_reason,
+  limeRuns: sim.lime_top_reason_runs.display,
+  limeReruns: sim.lime_reruns.display,
+  limeFit: sim.lime_local_fit_pct.display,
+  faithTop: sim.faith_drop_topk.display,
+  faithRandom: sim.faith_drop_random.display,
+  top3Pct: sim.shap_top3_share_pct.display,
+  cfRankNoHistory: sim.cf_rank_no_history.display,
+  cfIntensityFrom: sim.cf_intensity_from.display,
+  cfIntensityTo: sim.cf_intensity_to.display,
 };
+
+/** Rounded "N in 100" forms; the exact figure is always shown next to them. */
+export const per100 = (pct: string) => Math.round(Number(pct));
+
+/** Plain-language phrases for each signal, for generated sentences. */
+export const plainLabels: Record<Feature, string> = {
+  topic_history: "her past engagement with this topic",
+  emotional_intensity: "how emotionally intense the post is",
+  reactions: "how many reactions it has",
+  comment_rate: "how often people comment",
+  watch_completion: "how much of it people watch",
+  from_followed: "whether she follows the account",
+  hours_old: "how long ago it was posted",
+};
+
+/** The model's average score (SHAP base value). Scores are stored to 3 d.p.,
+ * so per-post derivations differ by <0.001; show their mean. */
+export const baseline = posts.reduce((a, p) => a + p.base, 0) / posts.length;

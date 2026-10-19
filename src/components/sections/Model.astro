@@ -1,55 +1,95 @@
 ---
 import SectionHead from "../SectionHead.astro";
 import Cite from "../Cite.astro";
-import { posts, shapMax, featureLabels, stats, TOLD, HIDDEN_TOP } from "../../lib/sim";
+import { posts, shapMax, featureLabels, plainLabels, stats, per100, baseline, TOLD, HIDDEN_TOP } from "../../lib/sim";
 
 const fmt = (v: number) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(3);
 const halfW = (v: number) => `${((Math.abs(v) / shapMax) * 50).toFixed(2)}%`;
-const meta = (p: (typeof posts)[number]) => `Ranked #${p.rank}. Score ${p.score.toFixed(3)} = baseline ${p.base.toFixed(3)} + these pushes.`;
+type P = (typeof posts)[number];
+const base = baseline.toFixed(3);
+const meta = (p: P) => `Ranked #${p.rank}. Score ${p.score.toFixed(3)}: the average, ${base}, plus the bars below.`;
+const pushes = (p: P) => {
+  const up = p.shap.filter((x) => x.v > 0).sort((a, b) => b.v - a.v)[0];
+  const down = p.shap.filter((x) => x.v < 0).sort((a, b) => a.v - b.v)[0];
+  const f2 = (v: number) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2);
+  const parts = [];
+  if (up) parts.push(`Biggest push up: ${plainLabels[up.f]} (${f2(up.v)}).`);
+  if (down) parts.push(`Biggest push down: ${plainLabels[down.f]} (${f2(down.v)}).`);
+  return parts.join(" ");
+};
 const top = posts.find((p) => p.rank === 1)!;
+const topEi = top.shap.find((x) => x.f === HIDDEN_TOP)!;
 const labData = JSON.stringify({
   max: shapMax,
   told: TOLD,
   hidden: HIDDEN_TOP,
   labels: featureLabels,
-  posts: posts.map((p) => ({ id: p.id, title: p.title, meta: meta(p), shap: p.shap })),
+  posts: posts.map((p) => ({ id: p.id, title: p.title, meta: meta(p), sum: pushes(p), shap: p.shap })),
 });
 const scoreMax = Math.max(...posts.map((p) => p.score));
 
-const bars = [
-  { label: "All posts", v: stats.shareAll },
-  { label: "Top 10% of rankings", v: stats.shareTop, hot: true },
-  { label: "Top 10%, without emotional intensity", v: stats.shareTopNoIntensity },
+const grids = [
+  { n: per100(stats.shareAll), exact: `${stats.shareAll}%`, label: "Every 100 posts", sub: "of all simulated posts" },
+  { n: per100(stats.shareTop), exact: `${stats.shareTop}%`, label: "Every 100 top-ranked", sub: "of the top 10% of rankings", hot: true },
+  { n: per100(stats.shareTopNoIntensity), exact: `${stats.shareTopNoIntensity}%`, label: "Top-ranked, no emotional intensity", sub: "of the top 10%, ranker retrained without it" },
+];
+
+const methods = [
+  {
+    name: "SHAP",
+    does: "Splits a post’s score into each signal’s share. The shares add up exactly to the score.",
+    found: "Emotional intensity was the biggest share, nearly tied with her past engagement with the topic.",
+    s: ["S69", "S28"],
+  },
+  {
+    name: "LIME",
+    does: "Builds a simpler stand-in model around one post and reads its reasons. Quicker, but approximate.",
+    found: `Named past engagement as the main reason in ${stats.limeRuns} of ${stats.limeReruns} reruns, but the stand-in reproduced only about ${stats.limeFit}% of the ranker’s behavior around that post.`,
+    s: ["S70", "S28"],
+  },
+  {
+    name: "Counterfactual",
+    does: "Asks what would have to change to knock the post out of her top three.",
+    found: `No change to the teen’s own history did: with no past engagement at all, the post still ranked #${stats.cfRankNoHistory}. Only lowering its emotional intensity from ${stats.cfIntensityFrom} to ${stats.cfIntensityTo} did.`,
+    s: ["S21", "S28"],
+  },
 ];
 
 const tests = [
-  { name: "Fidelity", verdict: "Pass / Partial", tone: "mixed", note: "SHAP pass, LIME partial" },
-  { name: "Faithfulness", verdict: "Pass", tone: "pass", note: "" },
-  { name: "Stability", verdict: "Pass", tone: "pass", note: "In this case" },
-  { name: "Completeness", verdict: "Fail", tone: "fail", note: "Platform-style reason" },
-  { name: "Human usefulness", verdict: "Fail", tone: "fail", note: "Not tested with users" },
+  { name: "Fidelity", q: "Does the explanation match what the model does?", verdict: "Pass / Partial", tone: "mixed",
+    a: `SHAP’s shares add up exactly to the score (pass). LIME’s stand-in reproduced about ${stats.limeFit}% (partial).` },
+  { name: "Faithfulness", q: "Do the signals it names really drive the score?", verdict: "Pass", tone: "pass",
+    a: `Removing SHAP’s top two signals cut the score by ${stats.faithTop}, versus an average of ${stats.faithRandom} for two picked at random.` },
+  { name: "Stability", q: "Same answer if you ask again?", verdict: "Pass", tone: "pass",
+    a: `LIME gave the same top reason in ${stats.limeRuns} of ${stats.limeReruns} reruns; SHAP’s top three held when the post was nudged.` },
+  { name: "Completeness", q: "Does it cover the main reasons?", verdict: "Fail", tone: "fail",
+    a: `SHAP’s top three signals cover ${stats.top3Pct}%. A platform-style one-line reason covers only ${stats.toldPct}%.` },
+  { name: "Human usefulness", q: "Could the teen actually use it?", verdict: "Fail", tone: "fail",
+    a: "Not tested with users. Judged against its audience, a SHAP number is not something a 14-year-old can act on." },
 ];
 ---
 <section class="section-y model" id="model" aria-labelledby="model-h">
   <div class="wrap">
     <div class="head-row">
       <SectionHead id="model-h" lens={{ n: 3, name: "Technical" }}>Inside a simulated feed</SectionHead>
-      <p class="lede measure head-aside">A ranker trained on {stats.impressions} simulated impressions orders the feed of a simulated {stats.age}-year-old. Pick a post to see what pushed it up or down.<Cite ids={["S28"]} /></p>
+      <p class="lede measure head-aside">A ranker, a model that predicts what someone will engage with, learned from {stats.impressions} simulated post views. Then it ordered the feed of a simulated {stats.age}-year-old.<Cite ids={["S28"]} /></p>
     </div>
 
     <figure class="proxy">
-      <div class="proxy-big">
-        <p class="num proxy-n">{stats.shareTop}%</p>
-        <figcaption class="proxy-cap">
-          Distress-related posts were {stats.shareAll}% of all simulated posts but {stats.shareTop}% of the top 10% of rankings ({stats.shareTopNoIntensity}% without emotional intensity). The model was never told which posts were distress-related.<Cite ids={["S28"]} />
-        </figcaption>
-      </div>
-      <ul class="proxy-bars" aria-label="Share of posts that are distress-related">
-        {bars.map((b) => (
-          <li class:list={["pb", { hot: b.hot }]}>
-            <span class="pb-l">{b.label}</span>
-            <span class="pb-track" aria-hidden="true"><span class="pb-fill" style={`width:${b.v}%`}></span></span>
-            <span class="pb-v num">{b.v}%</span>
+      <figcaption class="proxy-text">
+        <p class="proxy-lead">Distress-related posts (on sad, hopeless topics, like the sad-edit video and late-night venting post below) were about <strong>{grids[0].n} in every 100</strong> simulated posts. Among the posts the ranker scored highest, they were <strong class="hot">{grids[1].n} in every 100</strong>.<Cite ids={["S28"]} /></p>
+        <p>Even with the “emotional intensity” signal removed, {grids[2].n} in every 100 top-ranked posts still were.<Cite ids={["S28"]} /></p>
+        <p>Nobody told the ranker which posts were distress-related. It learned that they keep people engaged.<Cite ids={["S28"]} /></p>
+      </figcaption>
+      <ul class="grids">
+        {grids.map((g) => (
+          <li class:list={["grid", { hot: g.hot }]}>
+            <p class="g-label">{g.label}</p>
+            <p class="g-n"><span class="num">{g.n}</span> in 100</p>
+            <span class="g-cells" role="img" aria-label={`${g.n} of 100 squares filled`}>
+              {Array.from({ length: 100 }, (_, i) => <span class:list={["c", { on: i < g.n }]}></span>)}
+            </span>
+            <p class="g-exact">Exactly {g.exact} {g.sub}</p>
           </li>
         ))}
       </ul>
@@ -63,9 +103,10 @@ const tests = [
           <h3 class="lab-h">A simulated 14-year-old’s feed</h3>
           <button type="button" class="switch" role="switch" aria-checked="false" data-switch>
             <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
-            <span>Re-rank without emotional intensity</span>
+            <span>What if the ranker ignored emotional intensity?</span>
           </button>
         </div>
+        <p class="lab-help small">Click a post to see why it ranks where it does. Emotional intensity is how emotionally charged a post is; the switch shows the feed from a ranker retrained without that signal.<Cite ids={["S28"]} /></p>
         <ol class="feed" aria-label="Simulated feed, ranked">
           {posts.map((p) => (
             <li data-post={p.id} data-rank={p.rank} data-cf-rank={p.cfRank}>
@@ -89,10 +130,11 @@ const tests = [
 
       <div class="lab-panel" id="shap-panel" aria-live="polite">
         <p class="cf-note" data-cf-note hidden>
-          Same two posts on top: watch completion and comment rate carry the same information.<Cite ids={["S28"]} /> Bars below are from the original ranker.
+          The same two distress-related posts stay on top. Other signals, how much of a post people watch and how often they comment, carry the same information.<Cite ids={["S28"]} /> <span class="cf-sub">The bars below are still the original ranker’s.</span>
         </p>
         <div class="shap swap" data-shap>
           <h4 class="shap-h" data-shap-title>{top.title}</h4>
+          <p class="shap-sum" data-shap-sum>{pushes(top)}</p>
           <p class="shap-meta small" data-shap-meta>{meta(top)}</p>
           <ul class="shap-bars" data-shap-bars aria-label="Signals that moved this post's score">
             {top.shap.map((x) => (
@@ -104,32 +146,45 @@ const tests = [
             ))}
           </ul>
         </div>
+        <div class="howto small">
+          <p><strong>How to read this.</strong> The score is how strongly the ranker predicts this teen will engage with the post; higher scores are shown first. Every post starts from the average score, {base}. Each bar is how much one signal pushed this post up (right, +) or down (left, −): on the top post, {fmt(topEi.v)} means its emotional intensity alone raised its score by {topEi.v.toFixed(3)}.</p>
+        </div>
         <ul class="shap-key small" aria-label="Key">
           <li><span class="k k-hidden"></span>Emotional intensity of the post</li>
           <li><span class="k k-told"></span>User’s past engagement with this topic</li>
           <li><span class="k k-other"></span>Other signals</li>
         </ul>
-        <p class="shap-how small">SHAP values: right pushes a post up, left pushes it down.<Cite ids={["S69", "S28"]} /></p>
+        <p class="shap-how small">Technical term: these bars are SHAP values.<Cite ids={["S69", "S28"]} /></p>
         <button type="button" class="back-to-feed small" data-back>&uarr; Back to the feed</button>
       </div>
     </div>
   </feed-lab>
 
   <div class="wrap">
+    <div class="methods-block">
+      <h3 class="h-item">Three ways to explain a ranking</h3>
+      <ul class="methods">
+        {methods.map((m) => (
+          <li class="method">
+            <p class="m-name">{m.name}</p>
+            <p class="m-does">{m.does}</p>
+            <p class="m-found"><span class="m-k">Here:</span> {m.found}<Cite ids={m.s} /></p>
+          </li>
+        ))}
+      </ul>
+    </div>
     <div class="after">
-      <div>
-        <h3 class="h-item">Five tests of the explanations<Cite ids={["S20", "S28"]} /></h3>
-        <ul class="tests">
-          {tests.map((t) => (
-            <li class:list={["test", t.tone]}>
-              <span class="test-name">{t.name}</span>
-              <span class="test-v">{t.verdict}</span>
-              {t.note && <span class="test-note">{t.note}</span>}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p class="cf-line lede">No change to the teen’s own history moved the top post out of her top three; only changing the content did.<Cite ids={["S28", "S21"]} /></p>
+      <h3 class="h-item">Five tests of those explanations<Cite ids={["S20", "S28"]} /></h3>
+      <ul class="tests">
+        {tests.map((t) => (
+          <li class:list={["test", t.tone]}>
+            <span class="test-name">{t.name}</span>
+            <span class="test-q">{t.q}</span>
+            <span class="test-v">{t.verdict}</span>
+            <span class="test-a">{t.a}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 </section>
@@ -141,20 +196,26 @@ const tests = [
   }
   .head-aside { color: var(--color-ink-2); }
 
-  /* Proxy stat */
-  .proxy { margin-top: 3rem; display: grid; gap: 2rem; align-items: center; }
+  /* Proxy stat: three 10x10 grids */
+  .proxy { margin-top: 3rem; display: grid; gap: 2.25rem; align-items: start; }
   @media (width >= 64rem) { .proxy { grid-template-columns: 5fr 7fr; gap: 4rem; } }
-  .proxy-big { display: grid; gap: 1rem; }
-  .proxy-n { font-size: clamp(5rem, 3rem + 7vw, 9.5rem); color: var(--color-orange); }
-  .proxy-cap { font-size: 1rem; line-height: 1.6; max-width: 46ch; }
-  .proxy-bars { list-style: none; padding: 0; display: grid; gap: 1.1rem; }
-  .pb { display: grid; grid-template-columns: 1fr auto; gap: 0.35rem 1rem; align-items: end; }
-  .pb-l { font-size: 0.9375rem; }
-  .pb-v { font-size: 2rem; grid-row: 1 / span 2; grid-column: 2; align-self: end; min-width: 4.5ch; text-align: right; }
-  .pb-track { height: 1.75rem; background: var(--color-track); display: block; }
-  .pb-fill { display: block; height: 100%; background: var(--color-navy); }
-  .pb.hot .pb-fill { background: var(--color-orange); }
-  .pb.hot .pb-v { color: var(--color-orange); }
+  .proxy-text { display: grid; gap: 0.9rem; font-size: 1rem; line-height: 1.6; max-width: 50ch; }
+  .proxy-lead { font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem); line-height: 1.55; }
+  .proxy-lead strong { font-weight: 700; }
+  .proxy-lead strong.hot { color: var(--color-orange-ink); }
+  .grids { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  @media (width >= 40rem) { .grids { gap: 2rem; } }
+  .grid { display: grid; grid-row: span 4; grid-template-rows: subgrid; gap: 0.5rem; }
+  .g-label { font-size: 0.875rem; line-height: 1.3; font-weight: 700; align-self: end; }
+  .g-n { font-size: 0.9375rem; }
+  .g-n .num { font-size: clamp(2.5rem, 1.6rem + 3vw, 4.25rem); margin-right: 0.15rem; }
+  .grid.hot .g-n .num { color: var(--color-orange); }
+  .g-cells { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; }
+  .g-cells .c { aspect-ratio: 1; background: var(--color-track); }
+  .g-cells .c.on { background: var(--color-navy); }
+  .grid.hot .g-cells .c.on { background: var(--color-orange); }
+  .g-exact { font-size: 0.75rem; line-height: 1.35; color: var(--color-ink-2); }
+  @media (width < 30rem) { .g-label { font-size: 0.75rem; } }
 
   /* The lab */
   .lab { display: block; margin-top: 3.5rem; background: var(--color-navy); color: var(--color-paper); padding-block: 2.5rem; }
@@ -164,6 +225,11 @@ const tests = [
   .lab-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; margin-bottom: 1rem; }
   .lab-h { font-family: var(--font-display); text-transform: uppercase; font-weight: 400; font-size: 1.375rem; letter-spacing: 0.02em; }
   .lab-sim { margin-top: 0.9rem; color: var(--color-mist); font-style: italic; }
+  .lab-help { margin: -0.25rem 0 1rem; color: var(--color-mist); max-width: 60ch; }
+  .cf-sub { display: block; margin-top: 0.4rem; font-size: 0.8125rem; color: var(--color-mist); }
+  .shap-sum { margin-top: 0.75rem; font-size: 1.0625rem; line-height: 1.5; }
+  .howto { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--color-navy-3); color: var(--color-mist); line-height: 1.55; }
+  .howto strong { color: var(--color-paper); }
 
   .switch {
     display: inline-flex; align-items: center; gap: 0.6rem;
@@ -250,18 +316,29 @@ const tests = [
   .k-other { background: #8e95b8; }
 
   /* After the lab */
-  .after { margin-top: 3.5rem; display: grid; gap: 2rem; }
-  .tests { list-style: none; padding: 0; margin-top: 1.25rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  @media (width >= 40rem) { .tests { grid-template-columns: repeat(3, 1fr); } }
-  @media (width >= 64rem) { .tests { grid-template-columns: repeat(5, 1fr); } }
-  .test { display: grid; gap: 0.3rem; align-content: start; padding: 0.9rem 1rem; background: var(--color-paper); border-top: 6px solid var(--color-navy); }
+  .methods-block { margin-top: 3.5rem; }
+  .methods { list-style: none; padding: 0; margin-top: 1.25rem; display: grid; gap: 1.5rem; }
+  @media (width >= 56rem) { .methods { grid-template-columns: repeat(3, 1fr); gap: 2.5rem; } }
+  .method { border-top: 6px solid var(--color-navy); padding-top: 0.9rem; display: grid; gap: 0.5rem; align-content: start; }
+  .m-name { font-family: var(--font-display); text-transform: uppercase; font-size: 1.5rem; line-height: 1; letter-spacing: 0.02em; }
+  .m-does { font-size: 1rem; line-height: 1.55; }
+  .m-found { font-size: 0.9375rem; line-height: 1.55; color: var(--color-ink-2); }
+  .m-k { font-weight: 700; color: var(--color-navy); }
+
+  .after { margin-top: 3rem; }
+  .tests { list-style: none; padding: 0; margin-top: 1.25rem; display: grid; grid-template-columns: 1fr; gap: 0.5rem; }
+  @media (width >= 40rem) { .tests { grid-template-columns: repeat(2, 1fr); } }
+  @media (width >= 56rem) { .tests { grid-template-columns: repeat(3, 1fr); } }
+  @media (width >= 72rem) { .tests { grid-template-columns: repeat(5, 1fr); } }
+  .test { display: grid; grid-template-rows: auto auto auto 1fr; gap: 0.4rem; align-content: start; padding: 0.9rem 1rem 1rem; background: var(--color-paper); border-top: 6px solid var(--color-navy); }
   .test.fail { border-top-color: var(--color-orange); }
   .test.mixed { border-image: linear-gradient(to right, var(--color-navy) 50%, var(--color-orange) 50%) 1; border-top-width: 6px; border-top-style: solid; }
-  .test-name { font-size: 0.875rem; font-weight: 700; }
-  .test-v { font-family: var(--font-display); text-transform: uppercase; font-size: 1.75rem; line-height: 1; }
+  .test-name { font-size: 0.8125rem; color: var(--color-ink-2); }
+  .test-q { font-size: 1rem; line-height: 1.35; font-weight: 700; }
+  @media (width >= 72rem) { .test-q { min-height: 4.05em; } }
+  .test-v { font-family: var(--font-display); text-transform: uppercase; font-size: 1.5rem; line-height: 1; margin-top: 0.2rem; }
   .test.fail .test-v { color: var(--color-orange-ink); }
-  .test-note { font-size: 0.8125rem; line-height: 1.4; color: var(--color-ink-2); }
-  .cf-line { border-left: 6px solid var(--color-orange); padding-left: 1.25rem; max-width: 52ch; }
+  .test-a { font-size: 0.875rem; line-height: 1.45; }
 </style>
 
 <script>
@@ -274,11 +351,12 @@ const tests = [
       type Row = { f: string; v: number };
       const data = JSON.parse(this.dataset.lab!) as {
         max: number; told: string; hidden: string; labels: Record<string, string>;
-        posts: { id: string; title: string; meta: string; shap: Row[] }[];
+        posts: { id: string; title: string; meta: string; sum: string; shap: Row[] }[];
       };
       const panel = this.querySelector<HTMLElement>("[data-shap]")!;
       const title = this.querySelector<HTMLElement>("[data-shap-title]")!;
       const meta = this.querySelector<HTMLElement>("[data-shap-meta]")!;
+      const sum = this.querySelector<HTMLElement>("[data-shap-sum]")!;
       const barsEl = this.querySelector<HTMLUListElement>("[data-shap-bars]")!;
       const fmt = (v: number) => (v >= 0 ? "+" : "\u2212") + Math.abs(v).toFixed(3);
       const buttons = [...this.querySelectorAll<HTMLButtonElement>("button[data-target]")];
@@ -289,6 +367,7 @@ const tests = [
         const p = data.posts.find((x) => x.id === id)!;
         title.textContent = p.title;
         meta.textContent = p.meta;
+        sum.textContent = p.sum;
         barsEl.replaceChildren(
           ...p.shap.map((x) => {
             const li = document.createElement("li");

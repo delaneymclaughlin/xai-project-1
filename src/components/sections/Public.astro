@@ -1,7 +1,7 @@
 ---
 import SectionHead from "../SectionHead.astro";
 import Cite from "../Cite.astro";
-import { topShares, featureLabels, stats, TOLD, HIDDEN_TOP } from "../../lib/sim";
+import { topShares, featureLabels, stats, TOLD, HIDDEN_TOP, topPost } from "../../lib/sim";
 
 const told = topShares.find((x) => x.f === TOLD)!;
 const rest = topShares.filter((x) => x.f !== TOLD);
@@ -27,9 +27,10 @@ const hidden = rest.find((x) => x.f === HIDDEN_TOP)!;
       <figure class="actual">
         <p class="col-k">Actually happening</p>
         <div class="big2">
-          <p><span class="num big-n">{stats.toldPct}%</span><span class="big-l">explained by that reason</span></p>
-          <p class="hot"><span class="num big-n">{stats.untoldPct}%</span><span class="big-l">goes unmentioned</span></p>
+          <p><span class="num big-n">{stats.toldPct}%</span><span class="big-l">covered by the reason a platform would show</span></p>
+          <p class="hot"><span class="num big-n">{stats.untoldPct}%</span><span class="big-l">never mentioned</span></p>
         </div>
+        <p class="stack-k small">100% of why “{topPost.title}” ranked #1 in the simulated feed</p>
         <div class="stack" role="img" aria-label={`Why the top post ranked first: ${told.pct.toFixed(1)}% her past engagement with the topic, the reason she is told; ${hidden.pct.toFixed(1)}% the post's emotional intensity; ${(100 - told.pct - hidden.pct).toFixed(1)}% other signals. ${stats.untoldPct}% in all goes unmentioned.`}>
           <span class="seg seg-told" style={`flex-basis:${told.pct}%`}></span>
           {rest.map((x) => (
@@ -41,7 +42,7 @@ const hidden = rest.find((x) => x.f === HIDDEN_TOP)!;
           <span style={`flex-basis:${hidden.pct}%`} class="hl">{featureLabels[HIDDEN_TOP]}, its largest driver</span>
           <span class="rest">Other signals</span>
         </div>
-        <figcaption class="mt-5">In the simulation, that reason explains only {stats.toldPct}% of why the top post ranked first; the other {stats.untoldPct}%, including the post’s emotional intensity (its largest driver), goes unmentioned.<Cite ids={["S28", "S19"]} /></figcaption>
+        <figcaption class="mt-5">Of everything that pushed this post to the top, the one reason a platform would show covers about {Math.round(Number(stats.toldPct))}%. The other {Math.round(Number(stats.untoldPct))}%, including how emotionally intense the post is (the single biggest reason), goes unmentioned.<Cite ids={["S28", "S19"]} /> <span class="tech">Shares are each signal’s part of the post’s total SHAP attribution.</span></figcaption>
       </figure>
     </div>
   </div>
@@ -68,7 +69,9 @@ const hidden = rest.find((x) => x.f === HIDDEN_TOP)!;
   .big-n { font-size: clamp(3.5rem, 2rem + 5vw, 6.5rem); }
   .big2 .hot .big-n { color: var(--color-orange); }
   .big-l { font-size: 0.9375rem; }
-  .stack { margin-top: 1.75rem; display: flex; gap: 3px; height: 3.25rem; }
+  .stack-k { margin-top: 1.75rem; font-weight: 700; }
+  .tech { display: block; margin-top: 0.4rem; font-size: 0.8125rem; color: var(--color-ink-2); }
+  .stack { margin-top: 0.5rem; display: flex; gap: 3px; height: 3.25rem; }
   .seg { display: block; min-width: 3px; }
   .seg-told { background: var(--color-navy); }
   .seg-hidden { background: var(--color-orange); }
