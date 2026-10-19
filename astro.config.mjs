@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 // static assets (see wrangler.jsonc).
 export default defineConfig({
   // Placeholder until the workers.dev URL is known. Used for canonical/OG URLs.
-  site: 'https://xai-1.delaneymclaughlin.com',
+  site: 'https://xai1.delaneymclaughlin.com',
   // Keep spaces around inline links and citation markers in prose
   // (Astro 7 defaults to JSX-style whitespace collapsing).
   compressHTML: true,

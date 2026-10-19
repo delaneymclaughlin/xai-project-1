@@ -9,6 +9,6 @@
     "html_handling": "auto-trailing-slash"
   },
   "routes": [
-    { "pattern": "xai-1.delaneymclaughlin.com", "custom_domain": true }
+    { "pattern": "xai1.delaneymclaughlin.com", "custom_domain": true }
   ]
 }
