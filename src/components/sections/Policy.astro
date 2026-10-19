@@ -1,0 +1,212 @@
+---
+import SectionHead from "../SectionHead.astro";
+import Cite from "../Cite.astro";
+
+type Kind = "Access" | "Design" | "Transparency" | "Liability";
+type Effect = "No" | "Partly" | "Yes";
+const KINDS: Kind[] = ["Access", "Design", "Transparency", "Liability"];
+const EFFECTS: Effect[] = ["No", "Partly", "Yes"];
+
+const measures: { id: string; name: string; where: string; kind: Kind; effect: Effect; note: string; s: string[] }[] = [
+  { id: "au", name: "Under-16 ban", where: "Australia", kind: "Access", effect: "No", note: "Keeps under-16s off major platforms. The feed itself is untouched.", s: ["S5", "S34"] },
+  { id: "ny", name: "SAFE for Kids Act", where: "New York", kind: "Design", effect: "Partly", note: "Limits personalized feeds for minors from Jan. 25, 2027.", s: ["S6", "S45"] },
+  { id: "uk", name: "Children’s Codes", where: "United Kingdom", kind: "Design", effect: "Partly", note: "Recommends demoting harmful content for children.", s: ["S49", "S8"] },
+  { id: "dsa", name: "Digital Services Act", where: "European Union", kind: "Transparency", effect: "Partly", note: "Disclosure, plus a non-profiling feed option.", s: ["S9", "S10"] },
+  { id: "nm", name: "New Mexico v. Meta", where: "New Mexico", kind: "Liability", effect: "No", note: "$375M jury penalty plus a $567M abatement fund. No design changes ordered.", s: ["S17", "S59", "S65"] },
+];
+---
+<section class="section-y policy" id="policy" aria-labelledby="policy-h">
+  <div class="wrap">
+    <div class="head-row">
+      <SectionHead id="policy-h" lens={{ n: 2, name: "Policy" }}>Regulating access, not design</SectionHead>
+      <p class="lede measure head-aside">Five real measures, sorted by what they regulate. None fully regulates ranking.</p>
+    </div>
+
+    <policy-sort class="ps">
+      <div class="ps-controls" role="group" aria-label="Sort measures">
+        <span class="small text-ink-2">Sort by</span>
+        <button type="button" aria-pressed="true" data-sort="kind">What it regulates</button>
+        <button type="button" aria-pressed="false" data-sort="effect">Effect on ranking design</button>
+      </div>
+
+      <div class="ps-table" role="table" aria-label="Policy measures by what they regulate and whether they regulate ranking design">
+        <div class="ps-row ps-headrow" role="row">
+          <span role="columnheader" class="ps-c-name">Measure</span>
+          <span role="columnheader" class="ps-c-group">What it regulates</span>
+          <span role="columnheader" class="ps-c-group ps-c-effect">Regulates ranking design?</span>
+        </div>
+        <div class="ps-row ps-subhead" aria-hidden="true">
+          <span class="ps-c-name"></span>
+          <span class="ps-dots">{KINDS.map((k) => <span>{k}</span>)}</span>
+          <span class="ps-dots ps-effect">{EFFECTS.map((e) => <span>{e}</span>)}</span>
+        </div>
+        <ol class="ps-body" role="rowgroup">
+          {measures.map((m) => (
+            <li class="ps-row ps-item" role="row" data-kind={KINDS.indexOf(m.kind)} data-effect={EFFECTS.indexOf(m.effect)} data-id={m.id}>
+              <span role="cell" class="ps-c-name">
+                <span class="ps-name">{m.name}</span> <span class="ps-where">{m.where}</span>
+                <span class="ps-note">{m.note}<Cite ids={m.s} /></span>
+              </span>
+              <span role="cell" class="ps-dots">
+                <span class="sr-only">{m.kind}</span>
+                {KINDS.map((k) => <span class:list={["dot", { on: k === m.kind }]} aria-hidden="true"></span>)}
+                <span class="ps-tag" aria-hidden="true">{m.kind}</span>
+              </span>
+              <span role="cell" class="ps-dots ps-effect">
+                <span class="sr-only">Regulates ranking design: {m.effect}</span>
+                {EFFECTS.map((e) => <span class:list={["dot", { on: e === m.effect, part: e === "Partly", yes: e === "Yes" }]} aria-hidden="true"></span>)}
+                <span class="ps-tag" aria-hidden="true">Ranking: {m.effect}</span>
+              </span>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <p class="ps-status small text-ink-2" aria-live="polite">Sorted by what each measure regulates.</p>
+    </policy-sort>
+  </div>
+
+  <figure class="nm on-navy">
+    <div class="wrap nm-grid">
+      <blockquote class="nm-quote">
+        <p class="display"><span class="qm">“</span>Require legislative or executive branch action.<span class="qm">”</span></p>
+      </blockquote>
+      <figcaption class="nm-cap">
+        <p>New Mexico’s judge, declining to order changes to infinite scroll and autoplay, August 2026.<Cite ids={["S59", "S65"]} /></p>
+        <p class="nm-k">The thesis, in a court’s own words.</p>
+      </figcaption>
+    </div>
+  </figure>
+</section>
+
+<style>
+  .policy { padding-bottom: 0; }
+  .head-row { display: grid; gap: 1.25rem; }
+  @media (width >= 64rem) {
+    .head-row { grid-template-columns: 7fr 5fr; gap: 4rem; align-items: end; }
+  }
+  .head-aside { color: var(--color-ink-2); }
+
+  .ps { display: block; margin-top: 2.5rem; }
+  .ps-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; }
+  .ps-controls button {
+    font: inherit;
+    font-size: 0.9375rem;
+    padding: 0.45rem 0.9rem;
+    border: 2px solid var(--color-navy);
+    background: transparent;
+    color: var(--color-navy);
+    cursor: pointer;
+  }
+  .ps-controls button[aria-pressed="true"] { background: var(--color-navy); color: var(--color-paper); }
+
+  .ps-table { border-top: 6px solid var(--color-navy); }
+  .ps-body { list-style: none; padding: 0; position: relative; }
+  .ps-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .ps-headrow, .ps-subhead { display: none; }
+  .ps-name { font-family: var(--font-display); text-transform: uppercase; font-size: 1.5rem; line-height: 1; letter-spacing: 0.02em; }
+  .ps-where { font-style: italic; color: var(--color-ink-2); font-size: 0.9375rem; margin-left: 0.35rem; }
+  .ps-note { display: block; margin-top: 0.35rem; font-size: 0.9375rem; line-height: 1.5; max-width: 60ch; }
+  .ps-dots { display: flex; gap: 0.5rem; align-items: center; }
+  .ps-dots .dot { display: none; }
+  .ps-tag {
+    font-size: 0.8125rem;
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--color-navy);
+  }
+  @media (width < 56rem) {
+    .ps-item { grid-template-columns: auto auto 1fr; }
+    .ps-item > .ps-c-name { grid-column: 1 / -1; }
+  }
+
+  @media (width >= 56rem) {
+    .ps-row, .ps-item {
+      grid-template-columns: minmax(0, 1fr) 22rem 13rem;
+      gap: 2rem;
+      align-items: center;
+    }
+    .ps-headrow { display: grid; padding-block: 0.8rem 0.2rem; border-bottom: 0; font-size: 0.875rem; font-weight: 700; }
+    .ps-subhead { display: grid; padding-block: 0 0.6rem; border-bottom: 2px solid var(--color-navy); }
+    .ps-subhead .ps-dots span { flex: 1; text-align: center; font-size: 0.8125rem; color: var(--color-ink-2); }
+    .ps-c-group { text-align: center; }
+    .ps-tag { display: none; }
+    .ps-dots .dot {
+      display: block;
+      flex: 1;
+      height: 2.25rem;
+      background: var(--color-track);
+    }
+    .ps-dots .dot.on { background: var(--color-navy); }
+    .ps-effect .dot.on { background: var(--color-orange); }
+    .ps-effect .dot.part.on {
+      background: linear-gradient(to right, var(--color-orange) 50%, var(--color-track) 50%);
+      outline: 2px solid var(--color-orange);
+      outline-offset: -2px;
+    }
+    .ps-effect .dot.yes { background: transparent; outline: 1px dashed var(--color-ink-2); outline-offset: -1px; }
+  }
+
+  .ps-status { margin-top: 0.8rem; }
+
+  .nm {
+    margin-top: 4rem;
+    background: var(--color-navy);
+    color: var(--color-paper);
+    padding-block: 3.5rem;
+  }
+  .nm-grid { display: grid; gap: 1.75rem; }
+  @media (width >= 64rem) {
+    .nm-grid { grid-template-columns: 8fr 4fr; gap: 4rem; align-items: end; }
+  }
+  .nm-quote p {
+    font-size: clamp(2.5rem, 1.2rem + 4.4vw, 5.25rem);
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+  .qm { color: var(--color-orange-lit); }
+  .nm-cap p { font-size: 1rem; line-height: 1.55; }
+  .nm-k { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--color-orange-lit); font-style: italic; color: var(--color-mist); }
+</style>
+
+<script>
+  class PolicySort extends HTMLElement {
+    connectedCallback() {
+      const body = this.querySelector<HTMLOListElement>(".ps-body")!;
+      const status = this.querySelector<HTMLElement>(".ps-status")!;
+      const buttons = [...this.querySelectorAll<HTMLButtonElement>("button[data-sort]")];
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+      const original = [...body.children] as HTMLElement[];
+
+      const sortBy = (key: "kind" | "effect") => {
+        const items = [...body.children] as HTMLElement[];
+        const first = new Map(items.map((el) => [el, el.getBoundingClientRect().top]));
+        const next = [...original].sort(
+          (a, b) => Number(a.dataset[key]) - Number(b.dataset[key]) || original.indexOf(a) - original.indexOf(b),
+        );
+        next.forEach((el) => body.append(el));
+        if (!reduce.matches) {
+          for (const el of next) {
+            const dy = first.get(el)! - el.getBoundingClientRect().top;
+            if (!dy) continue;
+            el.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], {
+              duration: 450,
+              easing: "cubic-bezier(.2,.7,.2,1)",
+            });
+          }
+        }
+        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sort === key)));
+        status.textContent =
+          key === "kind"
+            ? "Sorted by what each measure regulates."
+            : "Sorted by effect on ranking design: two do not regulate it, three partly do, none fully does.";
+      };
+      buttons.forEach((b) => b.addEventListener("click", () => sortBy(b.dataset.sort as "kind" | "effect")));
+    }
+  }
+  customElements.define("policy-sort", PolicySort);
+</script>

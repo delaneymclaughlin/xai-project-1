@@ -1,33 +1,343 @@
 ---
-/** Technical lens (#act-model): the centerpiece. design.md 6.7. */
-import Section from "../Section.astro";
-import LensHeading from "../LensHeading.astro";
-import Takeaway from "../Takeaway.astro";
-import Para from "../Para.astro";
-import FeedInstrument from "./model/FeedInstrument.astro";
-import Scorecard from "./model/Scorecard.astro";
-import { model } from "../../lib/content";
----
-<Section id={model.id}>
-  <LensHeading lens={model} />
-  <Para para={model.intro} class="col-text text-lead measure-lead" />
+import SectionHead from "../SectionHead.astro";
+import Cite from "../Cite.astro";
+import { posts, shapMax, featureLabels, stats, TOLD, HIDDEN_TOP } from "../../lib/sim";
 
-  <div class="col-wide border-t border-ink pt-8">
-    <div class="grid gap-10 md:grid-cols-3 md:gap-8 lg:gap-12">
-      {model.methods.map((m) => (
-        <section>
-          <h3 class="font-serif text-h3 text-ink">{m.name}</h3>
-          <p class="mt-1 font-sans text-small text-ink-3">{m.line}</p>
-          <Para para={m.what} class="mt-4 text-body text-ink-2" />
-          <Para para={m.result} class="mt-4 text-body text-ink" />
-        </section>
-      ))}
+const fmt = (v: number) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(3);
+const halfW = (v: number) => `${((Math.abs(v) / shapMax) * 50).toFixed(2)}%`;
+const meta = (p: (typeof posts)[number]) => `Ranked #${p.rank}. Score ${p.score.toFixed(3)} = baseline ${p.base.toFixed(3)} + these pushes.`;
+const top = posts.find((p) => p.rank === 1)!;
+const labData = JSON.stringify({
+  max: shapMax,
+  told: TOLD,
+  hidden: HIDDEN_TOP,
+  labels: featureLabels,
+  posts: posts.map((p) => ({ id: p.id, title: p.title, meta: meta(p), shap: p.shap })),
+});
+const scoreMax = Math.max(...posts.map((p) => p.score));
+
+const bars = [
+  { label: "All posts", v: stats.shareAll },
+  { label: "Top 10% of rankings", v: stats.shareTop, hot: true },
+  { label: "Top 10%, without emotional intensity", v: stats.shareTopNoIntensity },
+];
+
+const tests = [
+  { name: "Fidelity", verdict: "Pass / Partial", tone: "mixed", note: "SHAP pass, LIME partial" },
+  { name: "Faithfulness", verdict: "Pass", tone: "pass", note: "" },
+  { name: "Stability", verdict: "Pass", tone: "pass", note: "In this case" },
+  { name: "Completeness", verdict: "Fail", tone: "fail", note: "Platform-style reason" },
+  { name: "Human usefulness", verdict: "Fail", tone: "fail", note: "Not tested with users" },
+];
+---
+<section class="section-y model" id="model" aria-labelledby="model-h">
+  <div class="wrap">
+    <div class="head-row">
+      <SectionHead id="model-h" lens={{ n: 3, name: "Technical" }}>Inside a simulated feed</SectionHead>
+      <p class="lede measure head-aside">A ranker trained on {stats.impressions} simulated impressions orders the feed of a simulated {stats.age}-year-old. Pick a post to see what pushed it up or down.<Cite ids={["S28"]} /></p>
     </div>
+
+    <figure class="proxy">
+      <div class="proxy-big">
+        <p class="num proxy-n">{stats.shareTop}%</p>
+        <figcaption class="proxy-cap">
+          Distress-related posts were {stats.shareAll}% of all simulated posts but {stats.shareTop}% of the top 10% of rankings ({stats.shareTopNoIntensity}% without emotional intensity). The model was never told which posts were distress-related.<Cite ids={["S28"]} />
+        </figcaption>
+      </div>
+      <ul class="proxy-bars" aria-label="Share of posts that are distress-related">
+        {bars.map((b) => (
+          <li class:list={["pb", { hot: b.hot }]}>
+            <span class="pb-l">{b.label}</span>
+            <span class="pb-track" aria-hidden="true"><span class="pb-fill" style={`width:${b.v}%`}></span></span>
+            <span class="pb-v num">{b.v}%</span>
+          </li>
+        ))}
+      </ul>
+    </figure>
   </div>
 
-  <FeedInstrument />
+  <feed-lab class="lab on-navy" data-lab={labData}>
+    <div class="wrap lab-grid">
+      <div class="lab-feed">
+        <div class="lab-top">
+          <h3 class="lab-h">A simulated 14-year-old’s feed</h3>
+          <button type="button" class="switch" role="switch" aria-checked="false" data-switch>
+            <span class="switch-track" aria-hidden="true"><span class="switch-knob"></span></span>
+            <span>Re-rank without emotional intensity</span>
+          </button>
+        </div>
+        <ol class="feed" aria-label="Simulated feed, ranked">
+          {posts.map((p) => (
+            <li data-post={p.id} data-rank={p.rank} data-cf-rank={p.cfRank}>
+              <button type="button" class="post" aria-pressed={p.rank === 1 ? "true" : "false"} aria-controls="shap-panel" data-target={p.id}>
+                <span class="post-rank num" data-rank-label>{p.rank}</span>
+                <span class="post-body">
+                  <span class="post-title">{p.title}</span>
+                  {p.distress && <span class="post-tag">Distress-related</span>}
+                </span>
+                <span class="post-score">
+                  <span class="post-score-track" aria-hidden="true"><span style={`width:${((p.score / scoreMax) * 100).toFixed(1)}%`}></span></span>
+                  <span class="post-score-v"><span class="sr-only">Score </span>{p.score.toFixed(2)}</span>
+                </span>
+                <span class="post-move" data-move aria-hidden="true"></span>
+              </button>
+            </li>
+          ))}
+        </ol>
+        <p class="lab-sim small">Simulated feed, user and model. No real platform data.</p>
+      </div>
 
-  <Para para={model.testsIntro} class="col-text text-lead measure-lead" />
-  <Scorecard />
-  <Takeaway para={model.takeaway} />
-</Section>
+      <div class="lab-panel" id="shap-panel" aria-live="polite">
+        <p class="cf-note" data-cf-note hidden>
+          Same two posts on top: watch completion and comment rate carry the same information.<Cite ids={["S28"]} /> Bars below are from the original ranker.
+        </p>
+        <div class="shap swap" data-shap>
+          <h4 class="shap-h" data-shap-title>{top.title}</h4>
+          <p class="shap-meta small" data-shap-meta>{meta(top)}</p>
+          <ul class="shap-bars" data-shap-bars aria-label="Signals that moved this post's score">
+            {top.shap.map((x) => (
+              <li class:list={["sb", { neg: x.v < 0, told: x.f === TOLD, hidden: x.f === HIDDEN_TOP }]}>
+                <span class="sb-l">{featureLabels[x.f]}</span>
+                <span class="sb-track" aria-hidden="true"><span class="sb-fill" style={`width:${halfW(x.v)}`}></span></span>
+                <span class="sb-v">{fmt(x.v)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <ul class="shap-key small" aria-label="Key">
+          <li><span class="k k-hidden"></span>Emotional intensity of the post</li>
+          <li><span class="k k-told"></span>User’s past engagement with this topic</li>
+          <li><span class="k k-other"></span>Other signals</li>
+        </ul>
+        <p class="shap-how small">SHAP values: right pushes a post up, left pushes it down.<Cite ids={["S69", "S28"]} /></p>
+      </div>
+    </div>
+  </feed-lab>
+
+  <div class="wrap">
+    <div class="after">
+      <div>
+        <h3 class="h-item">Five tests of the explanations<Cite ids={["S20", "S28"]} /></h3>
+        <ul class="tests">
+          {tests.map((t) => (
+            <li class:list={["test", t.tone]}>
+              <span class="test-name">{t.name}</span>
+              <span class="test-v">{t.verdict}</span>
+              {t.note && <span class="test-note">{t.note}</span>}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p class="cf-line lede">No change to the teen’s own history moved the top post out of her top three; only changing the content did.<Cite ids={["S28", "S21"]} /></p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .head-row { display: grid; gap: 1.25rem; }
+  @media (width >= 64rem) {
+    .head-row { grid-template-columns: 7fr 5fr; gap: 4rem; align-items: end; }
+  }
+  .head-aside { color: var(--color-ink-2); }
+
+  /* Proxy stat */
+  .proxy { margin-top: 3rem; display: grid; gap: 2rem; align-items: center; }
+  @media (width >= 64rem) { .proxy { grid-template-columns: 5fr 7fr; gap: 4rem; } }
+  .proxy-big { display: grid; gap: 1rem; }
+  .proxy-n { font-size: clamp(5rem, 3rem + 7vw, 9.5rem); color: var(--color-orange); }
+  .proxy-cap { font-size: 1rem; line-height: 1.6; max-width: 46ch; }
+  .proxy-bars { list-style: none; padding: 0; display: grid; gap: 1.1rem; }
+  .pb { display: grid; grid-template-columns: 1fr auto; gap: 0.35rem 1rem; align-items: end; }
+  .pb-l { font-size: 0.9375rem; }
+  .pb-v { font-size: 2rem; grid-row: 1 / span 2; grid-column: 2; align-self: end; min-width: 4.5ch; text-align: right; }
+  .pb-track { height: 1.75rem; background: var(--color-track); display: block; }
+  .pb-fill { display: block; height: 100%; background: var(--color-navy); }
+  .pb.hot .pb-fill { background: var(--color-orange); }
+  .pb.hot .pb-v { color: var(--color-orange); }
+
+  /* The lab */
+  .lab { display: block; margin-top: 3.5rem; background: var(--color-navy); color: var(--color-paper); padding-block: 2.5rem; }
+  @media (width >= 64rem) { .lab { padding-block: 3.5rem; } }
+  .lab-grid { display: grid; gap: 2.5rem; }
+  @media (width >= 64rem) { .lab-grid { grid-template-columns: 6fr 6fr; gap: 3.5rem; } }
+  .lab-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem 1.5rem; margin-bottom: 1rem; }
+  .lab-h { font-family: var(--font-display); text-transform: uppercase; font-weight: 400; font-size: 1.375rem; letter-spacing: 0.02em; }
+  .lab-sim { margin-top: 0.9rem; color: var(--color-mist); font-style: italic; }
+
+  .switch {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    font: inherit; font-size: 0.9375rem; color: var(--color-paper);
+    background: none; border: 0; padding: 0.3rem 0; cursor: pointer; text-align: left;
+  }
+  .switch-track { width: 2.6rem; height: 1.4rem; border: 2px solid var(--color-mist); position: relative; flex: none; transition: background-color .2s, border-color .2s; }
+  .switch-knob { position: absolute; top: 2px; left: 2px; width: 0.9rem; height: 0.9rem; background: var(--color-mist); transition: transform .2s; }
+  .switch[aria-checked="true"] .switch-track { background: var(--color-orange); border-color: var(--color-orange); }
+  .switch[aria-checked="true"] .switch-knob { transform: translateX(1.2rem); background: var(--color-paper); }
+
+  .feed { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+  .post {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2.25rem 1fr 6.5rem 1.75rem;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    font: inherit;
+    text-align: left;
+    color: var(--color-navy);
+    background: var(--color-paper);
+    border: 0;
+    border-left: 6px solid transparent;
+    cursor: pointer;
+  }
+  .post:hover { background: #fff; }
+  .post[aria-pressed="true"] { border-left-color: var(--color-orange); box-shadow: inset 0 0 0 2px var(--color-orange); }
+  .post-rank { font-size: 1.75rem; text-align: center; }
+  .post-body { display: grid; gap: 0.15rem; min-width: 0; }
+  .post-title { font-size: 0.9375rem; line-height: 1.35; }
+  .post-tag { font-size: 0.75rem; font-style: italic; color: var(--color-orange-ink); display: inline-flex; align-items: center; gap: 0.35rem; }
+  .post-tag::before { content: ""; width: 0.55rem; height: 0.55rem; background: var(--color-orange); }
+  .post-score { display: grid; gap: 0.2rem; justify-items: end; transition: opacity .3s; }
+  .post-score-track { width: 100%; height: 0.4rem; background: var(--color-track); display: block; }
+  .post-score-track span { display: block; height: 100%; background: var(--color-navy); }
+  .post-score-v { font-size: 0.8125rem; font-variant-numeric: tabular-nums; }
+  .post-move { font-size: 0.75rem; text-align: center; color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+  :global(feed-lab[data-cf]) .post-score { opacity: 0.25; }
+  @media (width < 30rem) {
+    .post { grid-template-columns: 1.75rem 1fr 3.25rem 1.4rem; gap: 0.5rem; padding-inline: 0.5rem; }
+    .post-score-track { display: none; }
+  }
+
+  .lab-panel { background: var(--color-navy-2); padding: 1.5rem; align-self: start; }
+  @media (width >= 64rem) { .lab-panel { padding: 2rem; position: sticky; top: 5rem; } }
+  .cf-note { margin-bottom: 1.25rem; padding: 0.8rem 1rem; border-left: 4px solid var(--color-orange-lit); background: var(--color-navy); font-size: 0.9375rem; line-height: 1.55; }
+  .shap-h { font-family: var(--font-display); text-transform: uppercase; font-weight: 400; font-size: clamp(1.5rem, 1.2rem + 1vw, 2.1rem); line-height: 1; letter-spacing: 0.01em; }
+  .shap-meta { margin-top: 0.5rem; color: var(--color-mist); }
+  .shap-bars { list-style: none; padding: 0; margin-top: 1.25rem; display: grid; gap: 0.55rem; }
+  .lab-panel :global(.sb) { display: grid; grid-template-columns: minmax(0, 12.5rem) 1fr 3.75rem; gap: 0.75rem; align-items: center; }
+  .lab-panel :global(.sb-l) { font-size: 0.875rem; line-height: 1.3; color: var(--color-mist); }
+  .lab-panel :global(.sb-v) { font-size: 0.8125rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .lab-panel :global(.sb-track) { position: relative; height: 1.25rem; display: block; }
+  .lab-panel :global(.sb-track::before) { content: ""; position: absolute; left: 50%; top: -0.2rem; bottom: -0.2rem; width: 1px; background: var(--color-mist); }
+  .lab-panel :global(.sb-fill) { position: absolute; left: 50%; top: 0; bottom: 0; background: #8e95b8; }
+  .lab-panel :global(.sb.neg .sb-fill) { left: auto; right: 50%; }
+  .lab-panel :global(.sb.told .sb-fill) { background: var(--color-paper); }
+  .lab-panel :global(.sb.told .sb-l) { color: var(--color-paper); }
+  .lab-panel :global(.sb.hidden .sb-fill) { background: var(--color-orange-lit); }
+  .lab-panel :global(.sb.hidden .sb-l) { color: var(--color-paper); }
+  @media (prefers-reduced-motion: no-preference) {
+    .lab-panel :global(.shap.swap .sb-fill) { animation: sbgrow 0.5s cubic-bezier(.2,.7,.2,1) both; }
+    .lab-panel :global(.sb:not(.neg) .sb-fill) { transform-origin: left; }
+    .lab-panel :global(.sb.neg .sb-fill) { transform-origin: right; }
+    @keyframes sbgrow { from { transform: scaleX(0); } }
+  }
+  :global(feed-lab[data-cf]) .shap { opacity: 0.55; }
+  @media (width < 30rem) {
+    .lab-panel :global(.sb) { grid-template-columns: 1fr 3.5rem; }
+    .lab-panel :global(.sb-l) { grid-column: 1 / -1; }
+  }
+  .shap-key { list-style: none; padding: 0; margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.25rem; color: var(--color-mist); }
+  .shap-key li { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .shap-how { margin-top: 0.6rem; color: var(--color-mist); }
+  .k { display: inline-block; width: 0.8rem; height: 0.8rem; flex: none; }
+  .k-hidden { background: var(--color-orange-lit); }
+  .k-told { background: var(--color-paper); }
+  .k-other { background: #8e95b8; }
+
+  /* After the lab */
+  .after { margin-top: 3.5rem; display: grid; gap: 2rem; }
+  .tests { list-style: none; padding: 0; margin-top: 1.25rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  @media (width >= 40rem) { .tests { grid-template-columns: repeat(3, 1fr); } }
+  @media (width >= 64rem) { .tests { grid-template-columns: repeat(5, 1fr); } }
+  .test { display: grid; gap: 0.3rem; align-content: start; padding: 0.9rem 1rem; background: var(--color-paper); border-top: 6px solid var(--color-navy); }
+  .test.fail { border-top-color: var(--color-orange); }
+  .test.mixed { border-image: linear-gradient(to right, var(--color-navy) 50%, var(--color-orange) 50%) 1; border-top-width: 6px; border-top-style: solid; }
+  .test-name { font-size: 0.875rem; font-weight: 700; }
+  .test-v { font-family: var(--font-display); text-transform: uppercase; font-size: 1.75rem; line-height: 1; }
+  .test.fail .test-v { color: var(--color-orange-ink); }
+  .test-note { font-size: 0.8125rem; line-height: 1.4; color: var(--color-ink-2); }
+  .cf-line { border-left: 6px solid var(--color-orange); padding-left: 1.25rem; max-width: 52ch; }
+</style>
+
+<script>
+  class FeedLab extends HTMLElement {
+    connectedCallback() {
+      const list = this.querySelector<HTMLOListElement>(".feed")!;
+      const items = [...list.children] as HTMLLIElement[];
+      const sw = this.querySelector<HTMLButtonElement>("[data-switch]")!;
+      const note = this.querySelector<HTMLElement>("[data-cf-note]")!;
+      type Row = { f: string; v: number };
+      const data = JSON.parse(this.dataset.lab!) as {
+        max: number; told: string; hidden: string; labels: Record<string, string>;
+        posts: { id: string; title: string; meta: string; shap: Row[] }[];
+      };
+      const panel = this.querySelector<HTMLElement>("[data-shap]")!;
+      const title = this.querySelector<HTMLElement>("[data-shap-title]")!;
+      const meta = this.querySelector<HTMLElement>("[data-shap-meta]")!;
+      const barsEl = this.querySelector<HTMLUListElement>("[data-shap-bars]")!;
+      const fmt = (v: number) => (v >= 0 ? "+" : "\u2212") + Math.abs(v).toFixed(3);
+      const buttons = [...this.querySelectorAll<HTMLButtonElement>("button[data-target]")];
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+
+      const select = (id: string) => {
+        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.target === id)));
+        const p = data.posts.find((x) => x.id === id)!;
+        title.textContent = p.title;
+        meta.textContent = p.meta;
+        barsEl.replaceChildren(
+          ...p.shap.map((x) => {
+            const li = document.createElement("li");
+            li.className = "sb";
+            if (x.v < 0) li.classList.add("neg");
+            if (x.f === data.told) li.classList.add("told");
+            if (x.f === data.hidden) li.classList.add("hidden");
+            const l = document.createElement("span");
+            l.className = "sb-l";
+            l.textContent = data.labels[x.f];
+            const track = document.createElement("span");
+            track.className = "sb-track";
+            track.setAttribute("aria-hidden", "true");
+            const fill = document.createElement("span");
+            fill.className = "sb-fill";
+            fill.style.width = `${((Math.abs(x.v) / data.max) * 50).toFixed(2)}%`;
+            track.append(fill);
+            const v = document.createElement("span");
+            v.className = "sb-v";
+            v.textContent = fmt(x.v);
+            li.append(l, track, v);
+            return li;
+          }),
+        );
+        panel.classList.remove("swap");
+        void panel.offsetWidth;
+        panel.classList.add("swap");
+      };
+      buttons.forEach((b) => b.addEventListener("click", () => select(b.dataset.target!)));
+
+      const rerank = (cf: boolean) => {
+        const first = new Map(items.map((el) => [el, el.getBoundingClientRect().top]));
+        const key = cf ? "cfRank" : "rank";
+        const sorted = [...items].sort((a, b) => Number(a.dataset[key]) - Number(b.dataset[key]));
+        sorted.forEach((el) => {
+          list.append(el);
+          const r = Number(el.dataset[key]);
+          el.querySelector("[data-rank-label]")!.textContent = String(r);
+          const move = el.querySelector<HTMLElement>("[data-move]")!;
+          const d = Number(el.dataset.rank) - Number(el.dataset.cfRank);
+          move.textContent = cf && d !== 0 ? (d > 0 ? `▲${d}` : `▼${-d}`) : cf ? "=" : "";
+        });
+        if (!reduce.matches) {
+          for (const el of sorted) {
+            const dy = first.get(el)! - el.getBoundingClientRect().top;
+            if (dy) el.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 600, easing: "cubic-bezier(.2,.7,.2,1)" });
+          }
+        }
+        sw.setAttribute("aria-checked", String(cf));
+        note.hidden = !cf;
+        this.toggleAttribute("data-cf", cf);
+      };
+      sw.addEventListener("click", () => rerank(sw.getAttribute("aria-checked") !== "true"));
+    }
+  }
+  customElements.define("feed-lab", FeedLab);
+</script>

@@ -1,0 +1,116 @@
+---
+interface Props { home?: boolean }
+const { home = false } = Astro.props;
+const base = home ? "" : "/";
+const links = [
+  { id: "ethics", n: 1, label: "Philosophical" },
+  { id: "policy", n: 2, label: "Policy" },
+  { id: "model", n: 3, label: "Technical" },
+  { id: "public", n: 4, label: "Public" },
+];
+---
+<nav class="site-nav on-navy" aria-label="Sections">
+  <div class="wrap nav-inner">
+    <a class="nav-title" href={home ? "#top" : "/"}>Algorithmic Design Features</a>
+    <ol class="nav-links">
+      {links.map((l) => (
+        <li><a href={`${base}#${l.id}`} data-nav={l.id}><span class="nav-n" aria-hidden="true">{l.n}</span>{l.label}</a></li>
+      ))}
+      <li class="nav-src"><a href="/sources" aria-current={home ? undefined : "page"}>Sources</a></li>
+    </ol>
+  </div>
+</nav>
+
+<style>
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--color-navy);
+    color: var(--color-paper);
+    border-bottom: 4px solid var(--color-orange);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 3.5rem;
+  }
+  .nav-title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 1.125rem;
+    text-decoration: none;
+    white-space: nowrap;
+    display: none;
+  }
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+    list-style: none;
+    padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-right: -0.5rem;
+  }
+  .nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--color-mist);
+    white-space: nowrap;
+  }
+  .nav-links a:hover,
+  .nav-links a[aria-current] { color: var(--color-paper); }
+  .nav-links a[aria-current] .nav-n { background: var(--color-orange); color: var(--color-paper); }
+  .nav-n {
+    display: inline-grid;
+    place-items: center;
+    width: 1.3rem;
+    height: 1.3rem;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    border: 1px solid var(--color-navy-3);
+    transition: background-color 0.2s;
+  }
+  .nav-src a { border-left: 1px solid var(--color-navy-3); padding-left: 0.85rem; margin-left: 0.35rem; }
+  @media (width < 34rem) {
+    .nav-n { display: none; }
+    .nav-links { margin-left: 0; margin-right: -0.5rem; justify-content: space-between; width: 100%; }
+    .nav-links { gap: 0; margin-right: -0.35rem; }
+    .nav-links a { padding-inline: 0.35rem; font-size: 0.78rem; }
+    .nav-src a { padding-left: 0.5rem; margin-left: 0.1rem; }
+  }
+  @media (width >= 64rem) { .nav-title { display: block; } }
+</style>
+
+<script>
+  // Mark the lens currently in view.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>("a[data-nav]")].map((a) => [a.dataset.nav!, a]),
+  );
+  const targets = [...links.keys()].map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+  if (targets.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const a = links.get(e.target.id);
+          if (!a) continue;
+          if (e.isIntersecting) {
+            links.forEach((l) => l.removeAttribute("aria-current"));
+            a.setAttribute("aria-current", "true");
+          } else if (a.hasAttribute("aria-current")) {
+            a.removeAttribute("aria-current");
+          }
+        }
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+</script>

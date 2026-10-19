@@ -1,0 +1,38 @@
+---
+import SectionHead from "../SectionHead.astro";
+---
+<section class="close on-navy" id="close" aria-labelledby="close-h">
+  <div class="wrap close-grid">
+    <div>
+      <SectionHead id="close-h">Look before the harm</SectionHead>
+      <p class="lede measure mt-6">Bans decide who sees an engagement-ranked feed and leave untouched what that feed is built to maximize. Explainable AI can make the design inspectable before harm, but only if its explanations are tested against the people who rely on them.</p>
+    </div>
+    <div class="close-side">
+      <p class="lim"><span class="lim-k">Limitations</span> The feed is simulated. Human usefulness was judged against the stated audience, not tested with users. Policy status is as of October 2026.</p>
+      <a class="src-link" href="/sources">Sources, claim ledger and fact-check status</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .close { background: var(--color-navy); color: var(--color-paper); padding-top: 5rem; padding-bottom: 1rem; }
+  @media (width >= 64rem) { .close { padding-top: 6.5rem; } }
+  .close-grid { display: grid; gap: 3rem; padding-bottom: 4rem; }
+  @media (width >= 64rem) { .close-grid { grid-template-columns: 7fr 5fr; gap: 5rem; align-items: end; } }
+  .close-side { display: grid; gap: 1.75rem; }
+  .lim { font-size: 0.9375rem; line-height: 1.6; color: var(--color-mist); border-top: 2px solid var(--color-navy-3); padding-top: 1rem; }
+  .lim-k { font-weight: 700; color: var(--color-paper); margin-right: 0.35rem; }
+  .src-link {
+    display: block;
+    padding: 1.1rem 1.25rem;
+    background: var(--color-orange);
+    color: var(--color-paper);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+  }
+  .src-link:hover { background: var(--color-band); }
+</style>

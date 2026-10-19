@@ -1,311 +1,176 @@
 @import "tailwindcss";
 
-/* ------------------------------------------------------------------
-   Design tokens (docs/design.md sections 3, 4, 5, 9).
-   Every token here becomes a Tailwind utility (bg-day, text-ink-2,
-   border-rule, text-h2, ...) and a CSS variable (var(--color-ink)).
-   Components use only these. No raw hex or px font sizes elsewhere.
-   ------------------------------------------------------------------ */
-
-/* Font aliases -> Astro Fonts API variables (see Layout.astro <Font />). */
+/* Font aliases -> Astro Fonts variables */
 @theme inline {
-  --font-serif: var(--font-literata);
-  --font-sans: var(--font-atkinson);
+  --font-display: var(--font-anton);
+  --font-serif: var(--font-baskerville);
 }
 
+/*
+ * One palette for the whole site, taken from the printed poster:
+ * navy and orange blocks on cream.
+ */
 @theme {
-  /* Night ground: cold open */
-  --color-night: #172036;
-  --color-night-2: #222D4A;
-  --color-moon: #DCE3F0;
-  --color-moon-2: #A3AECA;
-  --color-dot: #8792A8;
-
-  /* Day ground */
-  --color-day: #EEF1F3;
-  --color-day-2: #E1E6EB;
-  --color-surface: #FAFBFC;
-  --color-ink: #1A2233;
-  --color-ink-2: #465166;
-  --color-ink-3: #566176;
-  --color-rule: #C3CBD5;
-  --color-neg: #6B7486;
-
-  /* The one semantic hue pair: who controls the signal. Use for nothing else. */
-  --color-her: #2C6A80;
-  --color-her-tint: #D3E4EA;
-  --color-her-night: #7FB8CC;
-  --color-design: #9E3A5E;
-  --color-design-tint: #F1D9E2;
-  --color-design-night: #E39AB5;
-
-  /* Focus */
-  --color-focus: #2848C8;
-  --color-focus-night: #A9BCFF;
-
-  /* Type scale (design.md 4). Mobile value -> desktop value via clamp(). */
-  --text-cold: clamp(2.25rem, 1.2rem + 4.5vw, 4.5rem);
-  --text-cold--line-height: 1.08;
-  --text-display: clamp(2.25rem, 1.6rem + 3vw, 3.75rem);
-  --text-display--line-height: 1.1;
-  --text-h2: clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
-  --text-h2--line-height: 1.2;
-  --text-h3: clamp(1.3125rem, 1.25rem + 0.3vw, 1.5rem);
-  --text-h3--line-height: 1.3;
-  --text-lead: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
-  --text-lead--line-height: 1.55;
-  --text-body: 1.125rem;
-  --text-body--line-height: 1.65;
-  --text-ui: 1rem;
-  --text-ui--line-height: 1.4;
-  --text-small: 0.875rem;
-  --text-small--line-height: 1.45;
-  --text-micro: 0.75rem;
-  --text-micro--line-height: 1.3;
-
-  /* Rhythm */
-  --spacing-section: clamp(6rem, 4rem + 8vw, 10rem);
-  --spacing-block: clamp(2.5rem, 2rem + 2vw, 4rem);
-
-  /* Radii (design.md 3) */
-  --radius-panel: 6px;
-  --radius-pop: 8px;
-  --radius-bar: 1px;
-
-  /* Popover shadow: the only shadow on the page */
-  --shadow-pop: 0 1px 2px rgb(26 34 51 / 0.08), 0 8px 24px rgb(26 34 51 / 0.12);
-
-  /* Motion (design.md 9) */
-  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --dur-quick: 200ms;
-  --dur-base: 240ms;
-  --dur-reveal: 300ms;
-  --dur-reorder: 400ms;
+  --color-navy: #232d62;      /* primary text on cream; block ground */
+  --color-navy-2: #2d3973;    /* raised surface on navy */
+  --color-navy-3: #3a4680;    /* rules / tracks on navy */
+  --color-mist: #c9cee3;      /* secondary text on navy (8.3:1) */
+  --color-orange: #c8501e;    /* poster orange: large type, marks, bars */
+  --color-orange-ink: #a9431a;/* small orange text on cream (5.0:1) */
+  --color-orange-lit: #e87a48;/* orange marks/text on navy (4.5:1) */
+  --color-band: #b3441a;      /* thesis band ground (cream text 5.3:1) */
+  --color-cream: #f1ebe0;     /* page ground */
+  --color-paper: #faf7f1;     /* cards on cream or navy */
+  --color-ink-2: #5c6386;     /* secondary text on cream (4.9:1) */
+  --color-rule: #d8cfbf;      /* decorative rules on cream */
+  --color-track: #e4dccd;     /* empty bar track on cream/paper */
 }
 
-/* ------------------------------------------------------------------
-   Shared utilities
-   ------------------------------------------------------------------ */
-
-/* Container: 1200px max, 16 / 32 / 48px gutters. */
-@utility container-page {
-  width: 100%;
-  max-width: 1200px;
-  margin-inline: auto;
-  padding-inline: 16px;
-  @media (width >= 40rem) { padding-inline: 32px; }
-  @media (width >= 64rem) { padding-inline: 48px; }
-}
-
-/* 12-col grid with three named tracks. Children opt in with
-   col-rail / col-text / col-margin / col-wide. Below 1024px everything
-   spans the full container. */
-@utility page-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  column-gap: 24px;
-  @media (width >= 64rem) {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-  }
-}
-@utility col-rail {
-  display: none;
-  @media (width >= 64rem) { display: block; grid-column: 1 / span 2; }
-}
-@utility col-text {
-  grid-column: 1 / -1;
-  @media (width >= 64rem) { grid-column: 3 / span 6; }
-}
-@utility col-margin {
-  grid-column: 1 / -1;
-  @media (width >= 64rem) { grid-column: 9 / span 4; }
-}
-@utility col-wide {
-  grid-column: 1 / -1;
-  @media (width >= 64rem) { grid-column: 3 / span 10; }
-}
-
-/* Measures */
-@utility measure { max-width: 66ch; }
-@utility measure-lead { max-width: 58ch; }
-@utility measure-display { max-width: 18ch; }
-
-/* Numbers in instruments */
-@utility nums { font-variant-numeric: tabular-nums lining-nums; }
-
-/* Visually hidden but announced */
-@utility sr-only-focusable {
-  &:not(:focus):not(:focus-within) {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
-  }
-}
-
-/* ------------------------------------------------------------------
-   Base
-   ------------------------------------------------------------------ */
 @layer base {
   html {
-    overflow-x: clip;
+    background: var(--color-cream);
+    color: var(--color-navy);
+    font-family: var(--font-serif);
     -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
+    scroll-padding-top: 4.5rem;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
   }
   body {
+    background: var(--color-cream);
     overflow-x: clip;
-    background-color: var(--color-day);
-    color: var(--color-ink);
-    font-family: var(--font-serif);
-    font-size: var(--text-body);
-    line-height: var(--text-body--line-height);
-    font-optical-sizing: auto;
-    font-variant-numeric: oldstyle-nums proportional-nums;
-    -webkit-font-smoothing: antialiased;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
   }
-
-  h1, h2, h3, h4 { text-wrap: balance; font-weight: 450; }
-  p, li, dd, figcaption { text-wrap: pretty; }
-
-  /* Anchors clear the mobile lens bar */
-  [id] { scroll-margin-top: 56px; }
-
-  a {
-    color: inherit;
-    text-decoration-line: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.18em;
-  }
+  a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
   a:hover { text-decoration-thickness: 2px; }
-
-  /* Focus: always visible, never removed */
   :focus-visible {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
+    outline: 3px solid var(--color-orange);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
-  [data-ground="night"] :focus-visible { outline-color: var(--color-focus-night); }
-
-  /* Long URLs never cause horizontal scroll */
-  .break-anywhere { overflow-wrap: anywhere; }
-
-  ::selection { background: var(--color-day-2); color: var(--color-ink); }
-  [data-ground="night"] ::selection { background: var(--color-night-2); color: var(--color-moon); }
+  .on-navy :focus-visible, .on-band :focus-visible { outline-color: var(--color-paper); }
+  ::selection { background: var(--color-orange); color: var(--color-paper); }
 }
 
-/* Smooth scrolling only when motion is welcome */
-@media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; }
+/* ---------- Layout ---------- */
+@utility wrap {
+  width: 100%;
+  max-width: 82rem; /* 1312px */
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 48rem) { padding-inline: 2rem; }
+  @media (width >= 80rem) { padding-inline: 2.5rem; }
+}
+@utility measure { max-width: 64ch; }
+@utility section-y {
+  padding-block: 4.5rem;
+  @media (width >= 64rem) { padding-block: 6.5rem; }
 }
 
-/* Reduced motion: every duration becomes 0 (design.md 9). Scripts must also
-   check matchMedia('(prefers-reduced-motion: reduce)') before animating
-   (see prefersReducedMotion() in src/scripts/motion.ts). */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --dur-quick: 0ms;
-    --dur-base: 0ms;
-    --dur-reveal: 0ms;
-    --dur-reorder: 0ms;
-  }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Two cream sections in a row: one navy rule between them instead of
+   doubled padding. */
+.section-y + .section-y { padding-top: 0; }
+.section-y + .section-y > .wrap:first-child::before {
+  content: "";
+  display: block;
+  height: 6px;
+  background: var(--color-navy);
+  margin-bottom: 3.5rem;
 }
 
-/* ------------------------------------------------------------------
-   Citations (Cite.astro, Simulated.astro) and the shared popover
-   (#cite-pop in Layout.astro, behavior in src/scripts/cite.ts)
-   ------------------------------------------------------------------ */
-.cite-group {
-  vertical-align: super;
-  line-height: 0;
-  font-size: var(--text-micro);
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-variant-numeric: lining-nums tabular-nums;
-  color: var(--color-ink-2);
-  white-space: nowrap;
-}
-[data-ground="night"] .cite-group { color: var(--color-moon-2); }
-.cite-group .cite-sep { margin-right: 0.1em; }
-/* Tight visually (no padded-out gaps around single digits); the hit area is
-   widened with padding and pulled back with negative margin. */
-.cite {
-  display: inline-block;
-  min-height: 24px;
-  padding: 6px 5px;
-  margin: -6px -4px;
-  text-align: center;
-  color: inherit;
-  text-decoration: none;
-  line-height: 12px;
-  cursor: pointer;
-}
-.cite:hover { text-decoration: underline; }
-.sim-marker {
-  font-family: var(--font-sans);
-  font-size: var(--text-micro);
-  font-weight: 600;
-  color: var(--color-ink-2);
-  text-decoration: underline dotted var(--color-ink-3);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.25em;
-  white-space: nowrap;
-  cursor: pointer;
-  font-style: normal;
-}
-[data-ground="night"] .sim-marker { color: var(--color-moon-2); text-decoration-color: var(--color-moon-2); }
-
-#cite-pop {
-  position: fixed;
-  inset: auto;
-  margin: 0;
-  max-width: min(320px, calc(100vw - 32px));
-  padding: 0.875rem 1rem;
-  border: 0;
-  border-radius: var(--radius-pop);
-  background: var(--color-surface);
-  color: var(--color-ink);
-  box-shadow: var(--shadow-pop);
-  font-family: var(--font-sans);
-  font-size: var(--text-small);
-  line-height: var(--text-small--line-height);
-  font-style: normal;
+/* ---------- Type scale (one scale, used in every section) ---------- */
+@utility display {
+  font-family: var(--font-display);
   font-weight: 400;
-  color-scheme: light;
+  text-transform: uppercase;
+  line-height: 0.92;
+  letter-spacing: 0.005em;
 }
-#cite-pop[data-ground="night"] { background: var(--color-night-2); color: var(--color-moon); color-scheme: dark; }
-#cite-pop[data-ground="night"] :focus-visible { outline-color: var(--color-focus-night); }
-#cite-pop.is-sheet {
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
-  top: auto;
-  max-width: none;
-  max-height: 60vh;
-  overflow-y: auto;
+/* Section headline: identical everywhere */
+@utility h-section {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.75rem);
+  text-wrap: balance;
 }
-#cite-pop .cite-pop-title { font-weight: 600; overflow-wrap: anywhere; }
-#cite-pop .cite-pop-body { margin-top: 0.375rem; }
-#cite-pop .cite-pop-domain,
-#cite-pop .cite-pop-status { color: var(--color-ink-2); }
-#cite-pop[data-ground="night"] .cite-pop-domain,
-#cite-pop[data-ground="night"] .cite-pop-status { color: var(--color-moon-2); }
-#cite-pop .cite-pop-claim { margin-top: 0.375rem; }
+@utility h-item {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+}
+@utility num {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+@utility lede {
+  font-size: clamp(1.125rem, 1.05rem + 0.35vw, 1.3125rem);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+@utility small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
 
-/* Skip link */
+/* ---------- Citation markers ---------- */
+.cite {
+  font-family: var(--font-serif);
+  font-size: 0.68em;
+  line-height: 0;
+  vertical-align: super;
+  margin-left: 0.08em;
+  white-space: nowrap;
+}
+.cite a {
+  text-decoration: none;
+  color: var(--color-orange-ink);
+  font-weight: 700;
+  padding: 0 0.12em;
+}
+.on-navy .cite a { color: var(--color-orange-lit); }
+.on-band .cite a { color: var(--color-paper); }
+.cite a:hover { text-decoration: underline; }
+.h-item .cite, .h-section .cite { font-size: 0.875rem; letter-spacing: 0; vertical-align: top; line-height: 1; }
+
+#cite-tip {
+  position: fixed;
+  z-index: 60;
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: 0.6rem 0.8rem;
+  background: var(--color-navy);
+  color: var(--color-paper);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  border-left: 4px solid var(--color-orange);
+  pointer-events: none;
+  box-shadow: 0 10px 30px rgb(35 45 98 / 0.25);
+}
+#cite-tip[hidden] { display: none; }
+#cite-tip b { display: block; color: var(--color-orange-lit); font-weight: 700; margin-bottom: 0.15rem; }
+
 .skip-link {
   position: absolute;
-  left: 16px;
-  top: 8px;
-  z-index: 100;
-  padding: 0.5rem 0.875rem;
-  border-radius: var(--radius-panel);
-  background: var(--color-surface);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  font-size: var(--text-ui);
-  transform: translateY(-200%);
+  left: 1rem;
+  top: -4rem;
+  z-index: 80;
+  background: var(--color-paper);
+  color: var(--color-navy);
+  padding: 0.5rem 0.9rem;
 }
-.skip-link:focus { transform: none; }
+.skip-link:focus { top: 1rem; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

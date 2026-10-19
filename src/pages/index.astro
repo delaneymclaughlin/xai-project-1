@@ -1,35 +1,25 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import ContentNote from "../components/ContentNote.astro";
-import SiteFooter from "../components/SiteFooter.astro";
-import ColdOpen from "../components/sections/ColdOpen.astro";
-import Dawn from "../components/sections/Dawn.astro";
+import Nav from "../components/Nav.astro";
+import Hero from "../components/sections/Hero.astro";
+import Case from "../components/sections/Case.astro";
 import Thesis from "../components/sections/Thesis.astro";
-import LensRail from "../components/sections/LensRail.astro";
 import Ethics from "../components/sections/Ethics.astro";
-import Law from "../components/sections/Law.astro";
+import Policy from "../components/sections/Policy.astro";
 import Model from "../components/sections/Model.astro";
 import Public from "../components/sections/Public.astro";
-import Conclusion from "../components/sections/Conclusion.astro";
-import Limitations from "../components/sections/Limitations.astro";
-import Sources from "../components/sections/Sources.astro";
+import Close from "../components/sections/Close.astro";
 ---
 <Layout>
-  <ContentNote />
-  <main>
-    <ColdOpen />
-    <Dawn />
+  <Hero />
+  <Nav home />
+  <main id="main">
+    <Case />
     <Thesis />
-    <div class="relative" data-lenses>
-      <LensRail />
-      <Ethics />
-      <Law />
-      <Model />
-      <Public />
-    </div>
-    <Conclusion />
-    <Limitations />
-    <Sources />
+    <Ethics />
+    <Policy />
+    <Model />
+    <Public />
+    <Close />
   </main>
-  <SiteFooter />
 </Layout>

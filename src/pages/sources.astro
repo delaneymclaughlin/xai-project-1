@@ -1,0 +1,153 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "../components/Nav.astro";
+import SectionHead from "../components/SectionHead.astro";
+import { sources, ledger, limitations, verdictLabel, verdictHelp, type Verdict } from "../lib/sources";
+
+const counts = new Map<Verdict, number>();
+ledger.forEach((r) => r.verdict && counts.set(r.verdict, (counts.get(r.verdict) ?? 0) + 1));
+const order: Verdict[] = ["supported", "partially_supported", "outdated", "unverifiable", "pending-simulation"];
+const filters = order.filter((v) => counts.has(v));
+const num = (id: string) => id.slice(1);
+---
+<Layout title="Sources and fact-check | Algorithmic Design Features" description="Every source, every claim, and its fact-check status, for Algorithmic Design Features.">
+  <Nav />
+  <main id="main">
+    <section class="wrap section-y src-top">
+      <div class="head-row">
+        <SectionHead as="h1">Sources and fact-check</SectionHead>
+        <p class="lede measure head-aside">Every claim in the project, its sources, and what fact-checking found, checked on October 18, 2026.</p>
+      </div>
+      <div class="lims">
+        <h2 class="h-item">Limitations</h2>
+        <ul>{limitations.map((l) => <li>{l}</li>)}</ul>
+      </div>
+    </section>
+
+    <section class="ledger-band" aria-labelledby="ledger-h">
+      <div class="wrap">
+        <h2 class="h-section" id="ledger-h">Claim ledger</h2>
+        <claim-filter class="lf">
+          <div class="lf-controls" role="group" aria-label="Filter claims by fact-check status">
+            <button type="button" aria-pressed="true" data-filter="all">All <span>{ledger.length}</span></button>
+            {filters.map((v) => (
+              <button type="button" aria-pressed="false" data-filter={v}>{verdictLabel[v]} <span>{counts.get(v)}</span></button>
+            ))}
+          </div>
+          <p class="lf-status small" aria-live="polite">Showing all {ledger.length} claims.</p>
+          <dl class="legend small">
+            {filters.map((v) => (<div><dt class:list={["badge", v]}>{verdictLabel[v]}</dt><dd>{verdictHelp[v]}</dd></div>))}
+          </dl>
+          <ol class="claims">
+            {ledger.map((r) => (
+              <li class="claim" data-verdict={r.verdict ?? "none"} id={`claim-${r.id}`}>
+                <span class="c-id num">{r.id}</span>
+                <div class="c-body">
+                  <p>{r.text}</p>
+                  {r.note && (
+                    <details class="c-before small">
+                      <summary>Fact-check note</summary>
+                      <p>{r.note}</p>
+                    </details>
+                  )}
+                  <p class="c-where small">{r.where}</p>
+                </div>
+                <div class="c-meta">
+                  {r.verdict && <span class:list={["badge", r.verdict]}>{verdictLabel[r.verdict]}</span>}
+                  {r.sources.length > 0 && (
+                    <p class="c-src small">{r.sources.map((s, i) => (<>{i > 0 && ", "}<a href={`#${s}`}>S{num(s)}</a></>))}</p>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </claim-filter>
+      </div>
+    </section>
+
+    <section class="wrap section-y" aria-labelledby="sources-h">
+      <h2 class="h-section" id="sources-h">Sources</h2>
+      <ol class="srcs">
+        {sources.map((s) => (
+          <li id={s.id}>
+            <span class="s-n num">{s.n}</span>
+            <span>{s.url ? <a href={s.url} rel="noopener">{s.title}</a> : s.title}</span>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-10"><a href="/" class="back">Back to the story</a></p>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .head-row { display: grid; gap: 1.25rem; }
+  @media (width >= 64rem) { .head-row { grid-template-columns: 7fr 5fr; gap: 4rem; align-items: end; } }
+  .head-aside { color: var(--color-ink-2); }
+  .lims { margin-top: 3rem; display: grid; gap: 1rem; }
+  @media (width >= 64rem) { .lims { grid-template-columns: 3fr 9fr; gap: 4rem; } }
+  .lims ul { display: grid; gap: 0.75rem; padding-left: 1.1rem; list-style: square; }
+  .lims li { max-width: 70ch; }
+  .lims li::marker { color: var(--color-orange); }
+
+  .ledger-band { background: var(--color-paper); padding-block: 4rem; border-top: 6px solid var(--color-navy); }
+  .lf { display: block; margin-top: 1.5rem; }
+  .lf-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .lf-controls button { font: inherit; font-size: 0.9375rem; padding: 0.4rem 0.8rem; border: 2px solid var(--color-navy); background: transparent; color: var(--color-navy); cursor: pointer; }
+  .lf-controls button span { font-variant-numeric: tabular-nums; opacity: 0.75; margin-left: 0.2rem; }
+  .lf-controls button[aria-pressed="true"] { background: var(--color-navy); color: var(--color-paper); }
+  .lf-status { margin-top: 0.75rem; color: var(--color-ink-2); }
+  .legend { margin-top: 1.25rem; display: grid; gap: 0.5rem; }
+  @media (width >= 64rem) { .legend { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.75rem 2rem; } }
+  .legend div { display: flex; gap: 0.6rem; align-items: baseline; }
+  .legend dd { color: var(--color-ink-2); }
+
+  .claims { list-style: none; padding: 0; margin-top: 2rem; border-top: 2px solid var(--color-navy); }
+  .claim { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.5rem 1rem; padding-block: 1.1rem; border-bottom: 1px solid var(--color-rule); }
+  .claim[hidden] { display: none; }
+  @media (width >= 56rem) { .claim { grid-template-columns: 3rem minmax(0, 1fr) 13rem; gap: 2rem; } }
+  .c-id { font-size: 1.5rem; color: var(--color-ink-2); }
+  .c-body p:first-child { max-width: 72ch; font-size: 1rem; line-height: 1.6; }
+  .c-where { margin-top: 0.4rem; color: var(--color-ink-2); font-style: italic; }
+  .c-before { margin-top: 0.6rem; max-width: 72ch; }
+  .c-before summary { cursor: pointer; color: var(--color-orange-ink); font-weight: 700; }
+  .c-before p { margin-top: 0.4rem; color: var(--color-ink-2); }
+  .c-meta { grid-column: 2; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: baseline; }
+  @media (width >= 56rem) { .c-meta { grid-column: 3; flex-direction: column; } }
+  .badge { display: inline-block; font-size: 0.8125rem; font-weight: 700; padding: 0.15rem 0.55rem; border: 2px solid var(--color-navy); white-space: nowrap; }
+  .badge.supported { background: var(--color-navy); color: var(--color-paper); }
+  .badge.partially_supported, .badge.outdated { background: var(--color-orange-ink); border-color: var(--color-orange-ink); color: var(--color-paper); }
+  .badge.unverifiable { border-style: dashed; }
+  .badge.pending-simulation { background: transparent; }
+
+  .srcs { list-style: none; padding: 0; margin-top: 2rem; display: grid; gap: 0.9rem 3rem; }
+  @media (width >= 64rem) { .srcs { grid-template-columns: 1fr 1fr; } }
+  .srcs li { display: grid; grid-template-columns: 2.5rem 1fr; gap: 0.75rem; font-size: 0.9375rem; line-height: 1.5; overflow-wrap: anywhere; scroll-margin-top: 5rem; }
+  .srcs li:target { background: var(--color-paper); outline: 3px solid var(--color-orange); outline-offset: 6px; }
+  .s-n { font-size: 1.25rem; color: var(--color-orange-ink); }
+  .back { font-family: var(--font-display); text-transform: uppercase; font-size: 1.5rem; letter-spacing: 0.02em; }
+</style>
+
+<script>
+  class ClaimFilter extends HTMLElement {
+    connectedCallback() {
+      const buttons = [...this.querySelectorAll<HTMLButtonElement>("button[data-filter]")];
+      const claims = [...this.querySelectorAll<HTMLElement>(".claim")];
+      const status = this.querySelector<HTMLElement>(".lf-status")!;
+      buttons.forEach((b) =>
+        b.addEventListener("click", () => {
+          const f = b.dataset.filter!;
+          let n = 0;
+          claims.forEach((c) => {
+            const show = f === "all" || c.dataset.verdict === f;
+            c.hidden = !show;
+            if (show) n++;
+          });
+          buttons.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+          status.textContent = f === "all" ? `Showing all ${n} claims.` : `Showing ${n} ${b.firstChild?.textContent?.trim().toLowerCase()} claims.`;
+        }),
+      );
+    }
+  }
+  customElements.define("claim-filter", ClaimFilter);
+</script>

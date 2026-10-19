@@ -1,38 +1,46 @@
----
-/** Thesis (#thesis, day) plus the table of contents of the four lens questions. design.md 6.4. */
-import Section from "../Section.astro";
-import SectionHeading from "../SectionHeading.astro";
-import Claim from "../Claim.astro";
-import Para from "../Para.astro";
-import { thesis, lenses, splitSentences } from "../../lib/content";
-
-const [firstPara, ...restParas] = thesis.paragraphs;
-const [firstSpan, ...restSpans] = firstPara;
-const [display, ...afterDisplay] = splitSentences(firstSpan.t);
-// Same sources/claims, text split by sentence only (characters unchanged).
-const displayText = { ...firstSpan, t: display };
-const remainder = afterDisplay.length ? [{ ...firstSpan, t: afterDisplay.join(" ") }, ...restSpans] : restSpans;
----
-<Section id={thesis.id}>
-  <SectionHeading section={thesis.id} class="font-sans text-small font-semibold text-ink-3 !text-small">{thesis.heading}</SectionHeading>
-  <p class="col-text font-serif text-display font-normal text-ink measure-display"><Claim text={displayText} /></p>
-  <div class="col-text flex flex-col gap-6">
-    {remainder.length > 0 && <Para para={remainder} class="text-lead text-ink-2 measure-lead" />}
-    {restParas.map((p) => <Para para={p} class="text-lead text-ink-2 measure-lead" />)}
+<section class="thesis on-band" aria-labelledby="thesis-h">
+  <div class="wrap thesis-grid">
+    <h2 id="thesis-h" class="display thesis-line">Age-based bans regulate who can access social media, not how it is designed.</h2>
+    <div class="thesis-side">
+      <div class="split" aria-hidden="true">
+        <p><span class="split-k">Who</span><span class="split-v">Regulated</span></p>
+        <p class="off"><span class="split-k">How</span><span class="split-v">Largely not</span></p>
+      </div>
+      <p class="lede">Engagement-based ranking, the design choice driving harm to young users, remains largely unregulated, and explainable AI could make it inspectable before harm occurs rather than after.</p>
+    </div>
   </div>
-  <nav class="col-text" aria-label="The four lenses">
-    <ul class="flex flex-col divide-y divide-rule border-y border-rule">
-      {lenses.map((l) => (
-        <li>
-          <a
-            href={`#${l.id}`}
-            class="group flex flex-col gap-1 py-4 text-body text-ink no-underline sm:flex-row sm:items-baseline sm:gap-6"
-          >
-            <span class="w-20 shrink-0 font-sans text-small font-semibold text-ink-3">{l.lens}</span>
-            <span class="font-serif underline decoration-rule decoration-1 underline-offset-4 transition-[text-decoration-color] duration-(--dur-quick) group-hover:decoration-ink group-focus-visible:decoration-ink">{l.question}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </nav>
-</Section>
+</section>
+
+<style>
+  .thesis {
+    background: var(--color-band);
+    color: var(--color-paper);
+    padding-block: 4.5rem;
+  }
+  @media (width >= 64rem) { .thesis { padding-block: 6rem; } }
+  .thesis-grid { display: grid; gap: 2.5rem; }
+  @media (width >= 64rem) {
+    .thesis-grid { grid-template-columns: 7fr 4fr; gap: 5rem; align-items: end; }
+  }
+  .thesis-line {
+    font-size: clamp(2.5rem, 1.2rem + 4.6vw, 5.5rem);
+    line-height: 0.95;
+    text-wrap: balance;
+  }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1.75rem; }
+  .split p {
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.8rem 1rem;
+    background: var(--color-paper);
+    color: var(--color-navy);
+  }
+  .split p.off {
+    background: transparent;
+    color: var(--color-paper);
+    outline: 2px dashed rgb(250 247 241 / 0.75);
+    outline-offset: -2px;
+  }
+  .split-k { font-family: var(--font-display); text-transform: uppercase; font-size: 2rem; line-height: 1; }
+  .split-v { font-size: 0.875rem; font-style: italic; }
+</style>

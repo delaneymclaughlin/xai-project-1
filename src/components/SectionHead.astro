@@ -1,0 +1,39 @@
+---
+// The one headline treatment used by every section on the site.
+interface Props {
+  id?: string;
+  lens?: { n: number; name: string };
+  as?: "h1" | "h2";
+}
+const { id, lens, as: Tag = "h2" } = Astro.props;
+---
+<header class="sh">
+  {lens && (
+    <p class="sh-lens"><span class="sh-n" aria-hidden="true">{lens.n}</span><span><span class="sr-only">Lens {lens.n}: </span>{lens.name} lens</span></p>
+  )}
+  <Tag class="h-section" id={id}><slot /></Tag>
+</header>
+
+<style>
+  .sh-lens {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+    font-size: 0.9375rem;
+    color: var(--color-ink-2);
+  }
+  :global(.on-navy) .sh-lens { color: var(--color-mist); }
+  .sh-n {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--color-orange);
+    color: var(--color-paper);
+    font-family: var(--font-display);
+    font-style: normal;
+    font-size: 1rem;
+  }
+</style>

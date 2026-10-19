@@ -1,14 +1,16 @@
 ---
 import { Font } from "astro:assets";
 import "../styles/global.css";
-import { meta, citeData, SECTION_IDS } from "../lib/content";
-import JsonData from "../components/JsonData.astro";
 
 interface Props {
   title?: string;
   description?: string;
 }
-const { title = meta.title, description = meta.description } = Astro.props;
+const SITE = "Algorithmic Design Features";
+const {
+  title = SITE,
+  description = "How age-based bans overlook the design choices that shape what young users see. A data story by Delaney McLaughlin, Duke University.",
+} = Astro.props;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 ---
 <!doctype html>
@@ -18,23 +20,23 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : un
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="author" content={meta.author} />
+    <meta name="author" content="Delaney McLaughlin" />
     {canonical && <link rel="canonical" href={canonical} />}
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}
-    <meta name="twitter:card" content="summary" />
-    <meta name="theme-color" content="#172036" />
+    <meta name="theme-color" content="#232d62" />
+    <meta name="color-scheme" content="light" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-    <Font cssVariable="--font-literata" preload={[{ weight: 400, style: "normal" }]} />
-    <Font cssVariable="--font-atkinson" />
+    <Font cssVariable="--font-anton" preload />
+    <Font cssVariable="--font-baskerville" preload={[{ weight: 400, style: "normal" }]} />
   </head>
   <body>
-    <a class="skip-link" href={`#${SECTION_IDS.thesis}`}>Skip to the argument</a>
+    <a class="skip-link" href="#main">Skip to content</a>
     <slot />
-    <div id="cite-pop" popover="auto" role="dialog" aria-label="Source" tabindex="-1"></div>
-    <JsonData id="cite-data" data={citeData()} />
+    <script>
+      import "../scripts/cite.ts";
+    </script>
   </body>
 </html>

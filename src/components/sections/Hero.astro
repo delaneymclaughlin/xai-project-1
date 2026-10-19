@@ -1,0 +1,125 @@
+---
+// Hero: title set as the poster sets it, beside an emblem of the simulated
+// ranked feed: the two orange bars are the distress-related posts on top.
+import { posts } from "../../lib/sim";
+// Bar lengths are the simulated feed's real scores, in rank order.
+const max = Math.max(...posts.map((p) => p.score));
+const rows = [...posts].sort((a, b) => a.rank - b.rank).map((p) => ({ w: Math.round((p.score / max) * 100), hot: p.distress }));
+---
+<section class="hero on-navy" id="top" aria-labelledby="title">
+  <div class="wrap hero-grid">
+    <div class="hero-text">
+      <h1 id="title" class="display hero-title">Algorithmic<br /> Design<br /> Features</h1>
+      <p class="hero-sub">How age-based bans overlook the design choices that shape what young users see</p>
+      <p class="hero-by">Delaney McLaughlin <span aria-hidden="true">/</span> Duke University <span aria-hidden="true">/</span> MA in Applied Ethics &amp; Policy <span aria-hidden="true">/</span> AIPI 590</p>
+    </div>
+    <ol class="emblem" aria-hidden="true">
+      {rows.map((r, i) => (
+        <li class:list={["em-row", { hot: r.hot }]} style={`--w:${r.w}%; --i:${i}`}>
+          <span class="em-n">{i + 1}</span><span class="em-bar"></span>
+        </li>
+      ))}
+    </ol>
+  </div>
+  <p class="wrap hero-note"><span class="note-mark" aria-hidden="true">!</span> This page discusses self-harm and suicide. US: call or text <a href="tel:988">988</a>. UK: Samaritans <a href="tel:116123">116 123</a>.</p>
+</section>
+
+<style>
+  .hero {
+    background: var(--color-navy);
+    color: var(--color-paper);
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: 4rem 1.5rem;
+  }
+  .hero-grid {
+    flex: 1;
+    display: grid;
+    align-items: center;
+    gap: 3rem;
+  }
+  @media (width >= 60rem) {
+    .hero-grid { grid-template-columns: 7fr 5fr; gap: 4rem; }
+  }
+  .hero-title {
+    font-size: clamp(4.25rem, 0.9rem + 9.6vw, 9.5rem);
+    color: var(--color-paper);
+  }
+  .hero-sub {
+    margin-top: 2rem;
+    max-width: 30ch;
+    font-style: italic;
+    font-size: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    line-height: 1.4;
+    color: var(--color-paper);
+    text-wrap: balance;
+  }
+  .hero-by {
+    margin-top: 1.75rem;
+    font-size: 0.9375rem;
+    color: var(--color-mist);
+  }
+  .hero-by span { color: var(--color-orange-lit); padding-inline: 0.2rem; }
+
+  .emblem {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+  .em-row { display: flex; align-items: center; gap: 1rem; }
+  .em-n {
+    width: 1.5rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-mist);
+    text-align: right;
+  }
+  .em-bar {
+    display: block;
+    height: clamp(1.75rem, 1rem + 2vw, 2.75rem);
+    width: var(--w);
+    background: var(--color-navy-2);
+    border: 1px solid var(--color-navy-3);
+  }
+  .hot .em-bar { background: var(--color-orange); border-color: var(--color-orange); }
+  .hot .em-n { color: var(--color-orange-lit); }
+  @media (width < 60rem) {
+    .emblem { gap: 0.4rem; max-width: 26rem; }
+    .em-bar { height: 1.1rem; }
+    .em-n { font-size: 0.9rem; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .em-bar {
+      transform-origin: left;
+      animation: grow 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      animation-delay: calc(0.25s + var(--i) * 0.07s);
+    }
+    @keyframes grow { from { transform: scaleX(0); } }
+  }
+
+  .hero-note {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-navy-3);
+    font-size: 0.8125rem;
+    color: var(--color-mist);
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+  }
+  .note-mark {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 1px solid var(--color-orange-lit);
+    color: var(--color-orange-lit);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+  }
+  .hero-note a { color: var(--color-paper); }
+</style>

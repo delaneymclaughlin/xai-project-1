@@ -1,0 +1,59 @@
+---
+import SectionHead from "../SectionHead.astro";
+import Cite from "../Cite.astro";
+// 16,300 posts, 2,100 of them related to depression, self-harm or suicide.
+// One square per 100 posts: 163 squares, 21 of them orange (the first row).
+const TOTAL = 16300;
+const HARM = 2100;
+const PER = 100;
+const cells = Array.from({ length: TOTAL / PER }, (_, i) => i < HARM / PER);
+---
+<section class="case section-y" aria-labelledby="case-h">
+  <div class="wrap case-grid">
+    <div class="case-text">
+      <SectionHead id="case-h">Molly Russell, 14</SectionHead>
+      <p class="lede mt-6 measure">In November 2017, 14-year-old Molly Russell, from Harrow, north-west London, died from an act of self-harm while suffering from depression and the negative effects of online content.<Cite ids={["S29", "S1"]} /></p>
+      <p class="case-quote">The coroner found the platforms’ algorithms produced “binge periods” of content, some “selected and provided without Molly requesting them.”<Cite ids={["S29"]} /></p>
+    </div>
+
+    <figure class="case-fig">
+      <div class="stats">
+        <p class="stat"><span class="num stat-n">16,300</span><span class="stat-l">posts she saved, liked, or shared on Instagram in her last six months<Cite ids={["S30", "S1"]} /></span></p>
+        <p class="stat hot"><span class="num stat-n">2,100</span><span class="stat-l">of them related to depression, self-harm or suicide<Cite ids={["S30", "S1"]} /></span></p>
+      </div>
+      <div class="waffle" role="img" aria-label="163 squares, one per 100 posts; 21 squares, the whole first row, are orange for the 2,100 posts related to depression, self-harm or suicide.">
+        {cells.map((hot) => <span class:list={["sq", { hot }]}></span>)}
+      </div>
+      <figcaption class="small text-ink-2 mt-3">Each square is 100 posts.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<style>
+  .case-grid { display: grid; gap: 3rem; }
+  @media (width >= 64rem) {
+    .case-grid { grid-template-columns: 5fr 7fr; gap: 5rem; align-items: start; }
+  }
+  .case-quote {
+    margin-top: 2rem;
+    padding-left: 1.25rem;
+    border-left: 6px solid var(--color-orange);
+    font-style: italic;
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+    line-height: 1.55;
+    max-width: 40ch;
+  }
+  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 2.5rem; }
+  .stat { display: grid; gap: 0.6rem; align-content: start; }
+  .stat-n { font-size: clamp(3.5rem, 1.8rem + 6vw, 7.5rem); }
+  .stat.hot .stat-n { color: var(--color-orange); }
+  .stat-l { font-size: 0.9375rem; line-height: 1.5; max-width: 26ch; }
+  .waffle {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(21, 1fr);
+    gap: 3px;
+  }
+  .sq { aspect-ratio: 1; background: var(--color-navy); }
+  .sq.hot { background: var(--color-orange); }
+</style>

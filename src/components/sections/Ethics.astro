@@ -1,24 +1,64 @@
 ---
-/** Philosophical lens (#act-ethics). design.md 6.5. No script. */
-import Section from "../Section.astro";
-import LensHeading from "../LensHeading.astro";
-import Takeaway from "../Takeaway.astro";
-import Para from "../Para.astro";
-import { ethics } from "../../lib/content";
+import SectionHead from "../SectionHead.astro";
+import Cite from "../Cite.astro";
+const principles = [
+  {
+    name: "Autonomy",
+    line: "Ranking built to predict what a user will engage with, and keep supplying it, can undermine the conditions that make voluntary choice possible.",
+    s: ["S25", "S26"],
+  },
+  {
+    name: "Beneficence",
+    line: "These systems are optimized for engagement, so any benefit to the user is incidental to their actual objective.",
+    s: ["S25", "S3"],
+  },
+  {
+    name: "Nonmaleficence",
+    line: "When amplification of harmful content to vulnerable users is known, the resulting harm is foreseeable and preventable.",
+    s: ["S25", "S31"],
+  },
+  {
+    name: "Justice",
+    line: "The costs fall hardest on minors, users in distress, and regions with little oversight, as Amnesty International found of Facebook’s role in Myanmar.",
+    s: ["S25", "S24"],
+  },
+];
 ---
-<Section id={ethics.id}>
-  <LensHeading lens={ethics} />
-  <Para para={ethics.intro} class="col-text text-lead measure-lead" />
-  <div class="col-wide">
-    {ethics.pillars.map((p) => (
-      <div class="grid grid-cols-1 gap-x-6 gap-y-3 border-t border-rule py-8 first:pt-8 lg:grid-cols-10">
-        <div class="lg:col-span-2">
-          <h3 class="font-serif text-h3 italic text-ink">{p.name}</h3>
-          <p class="mt-2 font-sans text-small text-ink-2">{p.line}</p>
-        </div>
-        <Para para={p.body} class="text-body measure lg:col-span-6 lg:col-start-3" />
-      </div>
-    ))}
+<section class="section-y" id="ethics" aria-labelledby="ethics-h">
+  <div class="wrap">
+    <div class="head-row">
+      <SectionHead id="ethics-h" lens={{ n: 1, name: "Philosophical" }}>Why engagement ranking is wrong</SectionHead>
+      <p class="lede measure head-aside">Four principles of biomedical ethics, applied to a ranked feed.<Cite ids={["S25"]} /></p>
+    </div>
+    <ul class="pillars">
+      {principles.map((p) => (
+        <li class="pillar on-navy">
+          <h3 class="h-item">{p.name}</h3>
+          <p>{p.line}<Cite ids={p.s} /></p>
+        </li>
+      ))}
+    </ul>
   </div>
-  <Takeaway para={ethics.takeaway} />
-</Section>
+</section>
+
+<style>
+  .head-row { display: grid; gap: 1.25rem; }
+  @media (width >= 64rem) {
+    .head-row { grid-template-columns: 7fr 5fr; gap: 4rem; align-items: end; }
+  }
+  .head-aside { color: var(--color-ink-2); }
+  .pillars {
+    list-style: none;
+    padding: 0;
+    margin-top: 3rem;
+    display: grid;
+    gap: 2rem;
+  }
+  @media (width >= 40rem) { .pillars { grid-template-columns: 1fr 1fr; } }
+  @media (width >= 64rem) { .pillars { grid-template-columns: repeat(4, 1fr); gap: 2.5rem; } }
+  .pillar { background: var(--color-navy); color: var(--color-paper); padding: 1.5rem 1.4rem 1.75rem; }
+  .pillar:nth-child(even) { background: var(--color-band); }
+  .pillar p { margin-top: 0.9rem; font-size: 1rem; line-height: 1.6; }
+  .pillar :global(.cite a) { color: var(--color-paper); }
+  @media (width >= 64rem) { .pillars { gap: 0.75rem; } }
+</style>

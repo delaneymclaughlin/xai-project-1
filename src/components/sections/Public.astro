@@ -1,41 +1,82 @@
 ---
-/** Public lens (#act-public). design.md 6.8. */
-import Section from "../Section.astro";
-import LensHeading from "../LensHeading.astro";
-import Takeaway from "../Takeaway.astro";
-import Para from "../Para.astro";
-import ToldVsActual from "./public/ToldVsActual.astro";
-import { publicLens } from "../../lib/content";
+import SectionHead from "../SectionHead.astro";
+import Cite from "../Cite.astro";
+import { topShares, featureLabels, stats, TOLD, HIDDEN_TOP } from "../../lib/sim";
+
+const told = topShares.find((x) => x.f === TOLD)!;
+const rest = topShares.filter((x) => x.f !== TOLD);
+const hidden = rest.find((x) => x.f === HIDDEN_TOP)!;
 ---
-<Section id={publicLens.id}>
-  <LensHeading lens={publicLens} />
-  <Para para={publicLens.intro} class="col-text text-lead measure-lead" />
+<section class="section-y" id="public" aria-labelledby="public-h">
+  <div class="wrap">
+    <div class="head-row">
+      <SectionHead id="public-h" lens={{ n: 4, name: "Public" }}>What you’re told vs. what’s happening</SectionHead>
+      <p class="lede measure head-aside">TikTok and Meta have announced short reasons like this for why a post appears.<Cite ids={["S61", "S18"]} /></p>
+    </div>
 
-  <div class="col-text mt-10 lg:col-wide">
-    <ol class="m-0 list-none p-0">
-      {publicLens.features.map((f, i) => (
-        <li class:list={["border-t border-rule py-8", i === publicLens.features.length - 1 && "border-b"]}>
-          <h3 class="font-serif text-h3 text-ink m-0">{f.name}</h3>
-          <div class="mt-4 grid gap-6 md:grid-cols-2 md:gap-10">
-            <div>
-              <p class="m-0 mb-2 font-sans text-small font-semibold text-ink-3">What it says</p>
-              <Para para={f.says} class="text-body text-ink-2" />
-            </div>
-            <div>
-              <p class="m-0 mb-2 font-sans text-small font-semibold text-ink-3">What it leaves out</p>
-              <Para para={f.limits} class="text-body text-ink" />
-            </div>
-          </div>
-        </li>
-      ))}
-    </ol>
+    <div class="tva">
+      <figure class="told">
+        <p class="col-k">Told</p>
+        <div class="sheet">
+          <p class="sheet-h">Why you’re seeing this</p>
+          <p class="sheet-r">“{stats.platformReason}.”</p>
+        </div>
+        <figcaption class="small text-ink-2 mt-3">A paraphrase of TikTok’s “Why this video” wording.<Cite ids={["S19", "S61"]} /></figcaption>
+      </figure>
+
+      <figure class="actual">
+        <p class="col-k">Actually happening</p>
+        <div class="big2">
+          <p><span class="num big-n">{stats.toldPct}%</span><span class="big-l">explained by that reason</span></p>
+          <p class="hot"><span class="num big-n">{stats.untoldPct}%</span><span class="big-l">goes unmentioned</span></p>
+        </div>
+        <div class="stack" role="img" aria-label={`Why the top post ranked first: ${told.pct.toFixed(1)}% her past engagement with the topic, the reason she is told; ${hidden.pct.toFixed(1)}% the post's emotional intensity; ${(100 - told.pct - hidden.pct).toFixed(1)}% other signals. ${stats.untoldPct}% in all goes unmentioned.`}>
+          <span class="seg seg-told" style={`flex-basis:${told.pct}%`}></span>
+          {rest.map((x) => (
+            <span class:list={["seg", x.f === HIDDEN_TOP ? "seg-hidden" : "seg-other"]} style={`flex-basis:${x.pct}%`}></span>
+          ))}
+        </div>
+        <div class="stack-labels" aria-hidden="true">
+          <span style={`flex-basis:${told.pct}%`}>{featureLabels[TOLD]}</span>
+          <span style={`flex-basis:${hidden.pct}%`} class="hl">{featureLabels[HIDDEN_TOP]}, its largest driver</span>
+          <span class="rest">Other signals</span>
+        </div>
+        <figcaption class="mt-5">In the simulation, that reason explains only {stats.toldPct}% of why the top post ranked first; the other {stats.untoldPct}%, including the post’s emotional intensity (its largest driver), goes unmentioned.<Cite ids={["S28", "S19"]} /></figcaption>
+      </figure>
+    </div>
   </div>
+</section>
 
-  <ToldVsActual />
-
-  <div class="col-text mt-12">
-    <h3 class="font-serif text-h3 text-ink m-0 mb-3">{publicLens.stakes.heading}</h3>
-    <Para para={publicLens.stakes.body} class="text-body text-ink-2 measure" />
-  </div>
-  <Takeaway para={publicLens.takeaway} class="mt-12" />
-</Section>
+<style>
+  .head-row { display: grid; gap: 1.25rem; }
+  @media (width >= 64rem) {
+    .head-row { grid-template-columns: 7fr 5fr; gap: 4rem; align-items: end; }
+  }
+  .head-aside { color: var(--color-ink-2); }
+  .tva { margin-top: 3rem; display: grid; gap: 3rem; }
+  @media (width >= 64rem) { .tva { grid-template-columns: 4fr 7fr; gap: 0; } }
+  @media (width >= 64rem) {
+    .told { padding-right: 3.5rem; }
+    .actual { padding-left: 3.5rem; border-left: 6px solid var(--color-navy); }
+  }
+  .col-k { font-family: var(--font-display); text-transform: uppercase; font-size: 1.5rem; letter-spacing: 0.02em; margin-bottom: 1rem; }
+  .sheet { background: var(--color-navy); color: var(--color-paper); padding: 1.5rem 1.5rem 1.75rem; border-top: 6px solid var(--color-orange); }
+  .sheet-h { font-size: 0.875rem; color: var(--color-mist); font-weight: 700; }
+  .sheet-r { margin-top: 0.75rem; font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.6rem); line-height: 1.4; font-style: italic; }
+  .big2 { display: grid; grid-template-columns: auto auto; justify-content: start; gap: 1rem 3rem; }
+  .big2 p { display: grid; gap: 0.4rem; }
+  .big-n { font-size: clamp(3.5rem, 2rem + 5vw, 6.5rem); }
+  .big2 .hot .big-n { color: var(--color-orange); }
+  .big-l { font-size: 0.9375rem; }
+  .stack { margin-top: 1.75rem; display: flex; gap: 3px; height: 3.25rem; }
+  .seg { display: block; min-width: 3px; }
+  .seg-told { background: var(--color-navy); }
+  .seg-hidden { background: var(--color-orange); }
+  .seg-other { background: #e2a07f; }
+  .stack-labels { display: flex; gap: 3px; margin-top: 0.6rem; font-size: 0.8125rem; line-height: 1.35; }
+  .stack-labels span { padding-right: 0.75rem; }
+  .stack-labels .hl { color: var(--color-orange-ink); }
+  .stack-labels .rest { flex: 1; color: var(--color-ink-2); }
+  @media (width < 40rem) { .stack-labels .rest { display: none; } }
+  .actual figcaption { font-size: 1rem; line-height: 1.6; max-width: 62ch; }
+</style>
